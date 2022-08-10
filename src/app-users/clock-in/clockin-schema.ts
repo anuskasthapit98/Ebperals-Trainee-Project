@@ -1,48 +1,35 @@
-import { Field, ObjectType, ID, HideField } from '@nestjs/graphql';
+import { Schema as MongooseSchema } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 import { Project } from 'src/admin/projects/projects.schema';
 import { User } from 'src/admin/users/users.schema';
 
-export const LocationSchema = new mongoose.Schema({
-  type: {
-    type: String,
-    default: 'Point',
-  },
-  coordinates: {
-    type: [Number],
-  },
-});
-
-@ObjectType()
+@Schema()
 export class Location extends mongoose.Document {
-  @Field()
+  @Prop({ type: String })
   type: string;
 
-  @Field(() => [Number])
+  @Prop({ type: [Number] })
   coordinates: Number[];
 }
+export const LocationSchema = SchemaFactory.createForClass(Location);
 
-export const ClockInSchema = new mongoose.Schema({
-  userID: { type: mongoose.Schema.Types.ObjectId, ref: User },
-  time: { type: Date, required: true },
-  location: { type: LocationSchema, required: true },
-  projectId: { type: mongoose.Schema.Types.ObjectId, ref: Project },
-});
-
-@ObjectType()
+@Schema()
 export class ClockIn extends mongoose.Document {
-  @Field(() => ID)
-  id: mongoose.Types.ObjectId;
+  @Prop({ type: mongoose.Schema.Types.ObjectId })
+  _id: mongoose.Schema.Types.ObjectId;
 
-  @Field(() => Location)
+  @Prop({ type: LocationSchema })
   location: Location;
 
-  @Field()
+  @Prop({ type: String })
   time: Date;
 
-  @Field(() => User)
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
   userID: User;
 
-  @Field(() => Project)
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Project' }] })
   projectId: Project;
 }
+
+export const ClockInSchema = SchemaFactory.createForClass(ClockIn);

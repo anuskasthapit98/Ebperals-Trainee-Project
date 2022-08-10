@@ -1,6 +1,8 @@
 import { InputType, Int, Field, ID } from'@nestjs/graphql';
 import { User } from 'src/admin/users/dto/user.response';
 
+import { CreateUserInput } from 'src/admin/users/dto/create-user.input';
+
 @InputType()
 export class CreateProjectInput {
   @Field(() => String)
@@ -15,6 +17,6 @@ export class CreateProjectInput {
   @Field(() => Date)
   endDate: Date;
 
-  @Field(() => [User])
-  users: User[];
+  @Field(() => [CreateUserInput])
+  users: CreateUserInput[];
 }

@@ -2,6 +2,32 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type ClockIn {
+  _id: ID!
+  location: Location!
+  projectId: ID!
+  time: DateTime!
+  userId: ID!
+}
+
+input CreateClockInInput {
+  location: CreateLocationInput!
+  time: DateTime!
+}
+
+input CreateLocationInput {
+  coordinates: [Float!]!
+  type: String!
+}
+
+input CreateProjectInput {
+  description: String!
+  endDate: DateTime!
+  projectName: String!
+  startDate: DateTime!
+  users: [CreateUserInput!]!
+}
+
 input CreateTaskInput {
   description: String!
   endDate: DateTime!
@@ -16,6 +42,7 @@ input CreateUserInput {
   name: String!
   password: String!
   phone: Float!
+  userType: UserType!
   username: String!
 }
 
@@ -24,13 +51,33 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Location {
+  _id: ID!
+  coordinates: [Float!]!
+  type: String!
+}
+
 type Mutation {
+  addClockIn(clockInInput: CreateClockInInput!): ClockIn!
+  createProject(projectInput: CreateProjectInput!): Project!
   createTask(createTaskInput: CreateTaskInput!): Task!
   createUser(userInput: CreateUserInput!): User!
+  updateProject(updateProjectInput: UpdateProjectInput!): Project!
   updateUser(updateUserInput: UpdateUserInput!): User!
 }
 
+type Project {
+  _id: ID!
+  description: String!
+  endDate: DateTime!
+  projectName: String!
+  startDate: DateTime!
+  users: [User!]!
+}
+
 type Query {
+  clockIns: [ClockIn!]!
+  projects: [Project!]!
   tasks: [Task!]!
   users: [User!]!
 }
@@ -45,6 +92,15 @@ type Task {
   userId: ID!
 }
 
+input UpdateProjectInput {
+  _id: String!
+  description: String
+  endDate: DateTime
+  projectName: String
+  startDate: DateTime
+  users: [CreateUserInput!]
+}
+
 input UpdateUserInput {
   _id: ID!
   companyName: String
@@ -52,6 +108,7 @@ input UpdateUserInput {
   name: String
   password: String
   phone: Float
+  userType: UserType
   username: String
 }
 
@@ -62,5 +119,13 @@ type User {
   name: String!
   password: String!
   phone: Int!
+  userType: UserType!
   username: String!
+}
+
+enum UserType {
+  c
+  ms
+  pm
+  t
 }

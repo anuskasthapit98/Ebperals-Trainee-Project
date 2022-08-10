@@ -2,13 +2,13 @@ import { Schema as MongooseSchema } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 
-@Schema()
-export class UserType extends mongoose.Document {
-  @Prop({ type: String })
-  type: string;
-}
 
-export const UserTypeSchema = SchemaFactory.createForClass(UserType);
+export enum UserType {
+  pm='Project Manager',
+  ms='Normal Staff',
+  c='Client',
+  t='Tradies',
+}
 
 @Schema()
 export class User extends mongoose.Document {
@@ -33,8 +33,8 @@ export class User extends mongoose.Document {
   @Prop({ type: Number })
   phone: number;
 
-  @Prop({ type: UserTypeSchema })
-  userType: UserType;
+  @Prop({ type: String, enum: Object.values(UserType) })
+  userType: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

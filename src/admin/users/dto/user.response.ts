@@ -1,14 +1,8 @@
-import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
-import { UserTypeSchema } from '../users.schema';
+import { Field, ID, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 
-@ObjectType()
-export class UserType {
-  @Field(() => ID)
-  _id: string;
+import { UserType } from '../users.schema';
 
-  @Field(() => String)
-  type: string;
-}
+registerEnumType(UserType, { name: 'UserType' });
 
 @ObjectType()
 export class User {
@@ -33,6 +27,6 @@ export class User {
   @Field(() => Int)
   phone: number;
 
-  @Field(() => UserTypeSchema)
+  @Field(() => UserType)
   userType: UserType;
 }

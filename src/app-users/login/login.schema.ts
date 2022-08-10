@@ -1,19 +1,17 @@
-import { Field, ObjectType, ID, HideField } from '@nestjs/graphql';
+import { Schema as MongooseSchema } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 
-export const LoginSchema = new mongoose.Schema({
-  email: { type: String, required: true },
-  password: { type: String, required: true },
-});
-
-@ObjectType()
+@Schema()
 export class Login extends mongoose.Document {
-  @Field(() => ID)
-  id: mongoose.Types.ObjectId;
+  @Prop({ type: MongooseSchema.Types.ObjectId })
+  _id: mongoose.Types.ObjectId;
 
-  @Field()
+  @Prop({ type: String, required: true })
   email: string;
 
-  @HideField()
+  @Prop({ type: String, required: true })
   password: string;
 }
+
+export const LoginSchema = SchemaFactory.createForClass(Login);

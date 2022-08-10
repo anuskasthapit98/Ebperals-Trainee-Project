@@ -1,6 +1,7 @@
-import { Field, InputType } from '@nestjs/graphql';
-import { UserTypeSchema } from '../users.schema';
-import { UserType } from './user.response';
+import { Field, InputType, registerEnumType } from '@nestjs/graphql';
+import { UserType } from '../users.schema';
+
+registerEnumType(UserType, { name: 'UserType' });
 
 @InputType()
 export class CreateUserInput {
@@ -22,6 +23,6 @@ export class CreateUserInput {
   @Field(() => Number)
   phone: number;
 
-  @Field(() => UserTypeSchema)
+  @Field(() => UserType)
   userType: UserType;
 }
