@@ -16,9 +16,6 @@ export const LocationSchema = SchemaFactory.createForClass(Location);
 
 @Schema()
 export class ClockIn extends mongoose.Document {
-  @Prop({ type: mongoose.Schema.Types.ObjectId })
-  _id: mongoose.Schema.Types.ObjectId;
-
   @Prop({ type: LocationSchema })
   location: Location;
 

@@ -10,6 +10,16 @@ type ClockIn {
   userId: ID!
 }
 
+input CreateAdminInput {
+  companyName: String!
+  email: String!
+  name: String!
+  password: String!
+  phone: Float!
+  role: Role!
+  username: String!
+}
+
 input CreateClockInInput {
   location: CreateLocationInput!
   time: DateTime!
@@ -42,6 +52,7 @@ input CreateUserInput {
   name: String!
   password: String!
   phone: Float!
+  role: Role!
   userType: UserType!
   username: String!
 }
@@ -59,6 +70,7 @@ type Location {
 
 type Mutation {
   addClockIn(clockInInput: CreateClockInInput!): ClockIn!
+  createAdmin(userInput: CreateAdminInput!): User!
   createProject(projectInput: CreateProjectInput!): Project!
   createTask(createTaskInput: CreateTaskInput!): Task!
   createUser(userInput: CreateUserInput!): User!
@@ -80,6 +92,11 @@ type Query {
   projects: [Project!]!
   tasks: [Task!]!
   users: [User!]!
+}
+
+enum Role {
+  ADMIN
+  USER
 }
 
 type Task {
@@ -108,24 +125,25 @@ input UpdateUserInput {
   name: String
   password: String
   phone: Float
+  role: Role
   userType: UserType
   username: String
 }
 
 type User {
-  _id: ID!
   companyName: String!
   email: String!
+  id: ID!
   name: String!
-  password: String!
-  phone: Int!
+  phone: Float!
+  role: String!
   userType: UserType!
   username: String!
 }
 
 enum UserType {
-  c
-  ms
-  pm
-  t
+  CLIENT
+  NORMAL_STAFF
+  PROJECT_MANAGER
+  TRADIES
 }

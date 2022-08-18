@@ -2,19 +2,15 @@ import { Schema as MongooseSchema } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 
-
 export enum UserType {
-  pm='Project Manager',
-  ms='Normal Staff',
-  c='Client',
-  t='Tradies',
+  PROJECT_MANAGER = 'project manager',
+  NORMAL_STAFF = 'normal staff',
+  CLIENT = 'client',
+  TRADIES = 'tradies',
 }
 
 @Schema()
 export class User extends mongoose.Document {
-  @Prop({ type: MongooseSchema.Types.ObjectId })
-  _id: MongooseSchema.Types.ObjectId;
-
   @Prop({ type: String })
   name: string;
 

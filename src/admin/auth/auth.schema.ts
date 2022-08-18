@@ -3,7 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 
 @Schema()
-export class Login extends mongoose.Document {
+export class Auth extends mongoose.Document {
   @Prop({ type: String, required: true })
   email: string;
 
@@ -11,4 +11,4 @@ export class Login extends mongoose.Document {
   password: string;
 }
 
-export const LoginSchema = SchemaFactory.createForClass(Login);
+export const AuthSchema = SchemaFactory.createForClass(Auth);

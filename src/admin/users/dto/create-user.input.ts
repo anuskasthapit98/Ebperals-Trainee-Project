@@ -1,4 +1,4 @@
-import { Field, InputType, registerEnumType } from '@nestjs/graphql';
+import { Field, HideField, InputType, registerEnumType } from '@nestjs/graphql';
 import { UserType } from '../users.schema';
 
 registerEnumType(UserType, { name: 'UserType' });
@@ -17,7 +17,7 @@ export class CreateUserInput {
   @Field(() => String)
   email: string;
 
-  @Field(() => String)
+  @Field()
   password: string;
 
   @Field(() => Number)

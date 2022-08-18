@@ -1,6 +1,4 @@
 import { InputType, Int, Field, ID } from'@nestjs/graphql';
-import { User } from 'src/admin/users/dto/user.response';
-
 import { CreateUserInput } from 'src/admin/users/dto/create-user.input';
 
 @InputType()

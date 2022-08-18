@@ -1,13 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
-import { Project } from '../projects/projects.schema';
-import { User } from '../users/users.schema';
+import { Project } from '../../admin/projects/projects.schema';
+import { User } from '../../admin/users/users.schema';
 
 @Schema()
 export class Task extends mongoose.Document {
-  @Prop({ type: mongoose.Schema.Types.ObjectId })
-  _id: mongoose.Schema.Types.ObjectId;
-
   @Prop({ type: String })
   taskName: string;
 

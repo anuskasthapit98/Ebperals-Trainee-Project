@@ -6,14 +6,14 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
-import { User } from '../../admin/users/dto/user.response';
-import { AuthService } from './login.service';
+import { Admin } from '../admins/dto/admin.response';
+import { AuthService } from './auth.service';
 import { LoginInput } from './dto/create-login.input';
-import { CurrentUser } from './current-user.decorator';
+import { CurrentUser } from './decorators/current-user.decorator';
 import { UseGuards } from '@nestjs/common';
-import { JwtGuard } from './jwt.guard';
+import { JwtGuard } from './guards/jwt.guard';
 
-@Resolver(() => User)
+@Resolver(() => Admin)
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
@@ -22,9 +22,9 @@ export class AuthResolver {
     return this.authService.login(loginData);
   }
 
-  @Query(() => User)
+  @Query(() => Admin)
   @UseGuards(JwtGuard)
-  me(@CurrentUser() user: User): User {
+  me(@CurrentUser() user: Admin): Admin {
     return user;
   }
 }

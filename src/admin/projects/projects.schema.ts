@@ -4,9 +4,6 @@ import { User } from '../users/users.schema';
 
 @Schema()
 export class Project extends mongoose.Document {
-  @Prop({ type: mongoose.Schema.Types.ObjectId })
-  _id: mongoose.Schema.Types.ObjectId;
-
   @Prop({ type: String })
   projectName: string;
 

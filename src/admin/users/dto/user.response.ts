@@ -1,4 +1,11 @@
-import { Field, ID, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
+import {
+  Field,
+  HideField,
+  ID,
+  Int,
+  ObjectType,
+  registerEnumType,
+} from '@nestjs/graphql';
 
 import { UserType } from '../users.schema';
 
@@ -7,7 +14,7 @@ registerEnumType(UserType, { name: 'UserType' });
 @ObjectType()
 export class User {
   @Field(() => ID)
-  _id: string;
+  id: string;
 
   @Field(() => String)
   name: string;
@@ -21,10 +28,10 @@ export class User {
   @Field(() => String)
   email: string;
 
-  @Field(() => String)
+  @Field()
   password: string;
 
-  @Field(() => Int)
+  @Field(() => Number)
   phone: number;
 
   @Field(() => UserType)

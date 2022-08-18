@@ -1,0 +1,161 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  id: ID!
+  name: String!
+  username: String!
+  companyName: String!
+  email: String!
+  password: String!
+  phone: Float!
+  userType: UserType!
+}
+
+enum UserType {
+  PROJECT_MANAGER
+  NORMAL_STAFF
+  CLIENT
+  TRADIES
+}
+
+type Project {
+  _id: ID!
+  projectName: String!
+  description: String!
+  startDate: DateTime!
+  endDate: DateTime!
+  users: [User!]!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Task {
+  _id: ID!
+  taskName: String!
+  description: String!
+  startDate: DateTime!
+  endDate: DateTime!
+  userId: ID!
+  projectId: ID!
+}
+
+type Location {
+  _id: ID!
+  type: String!
+  coordinates: [Float!]!
+}
+
+type ClockIn {
+  _id: ID!
+  location: Location!
+  time: DateTime!
+  userId: ID!
+  projectId: ID!
+}
+
+type Admin {
+  id: ID!
+  name: String!
+  email: String!
+  password: String!
+}
+
+type Query {
+  users: [User!]!
+  projects: [Project!]!
+  tasks: [Task!]!
+  clockIns: [ClockIn!]!
+  me: Admin!
+  admins: [Admin!]!
+}
+
+type Mutation {
+  createUser(userInput: CreateUserInput!): User!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+  createProject(projectInput: CreateProjectInput!): Project!
+  updateProject(updateProjectInput: UpdateProjectInput!): Project!
+  createTask(createTaskInput: CreateTaskInput!): Task!
+  addClockIn(clockInInput: CreateClockInInput!): ClockIn!
+  login(loginData: LoginInput!): String!
+  createAdmin(adminInput: CreateAdminInput!): Admin!
+  updateAdmin(updateAdminInput: UpdateAdminInput!): Admin!
+}
+
+input CreateUserInput {
+  name: String!
+  username: String!
+  companyName: String!
+  email: String!
+  password: String!
+  phone: Float!
+  userType: UserType!
+}
+
+input UpdateUserInput {
+  name: String
+  username: String
+  companyName: String
+  email: String
+  password: String
+  phone: Float
+  userType: UserType
+  _id: ID!
+}
+
+input CreateProjectInput {
+  projectName: String!
+  description: String!
+  startDate: DateTime!
+  endDate: DateTime!
+  users: [CreateUserInput!]!
+}
+
+input UpdateProjectInput {
+  projectName: String
+  description: String
+  startDate: DateTime
+  endDate: DateTime
+  users: [CreateUserInput!]
+  _id: String!
+}
+
+input CreateTaskInput {
+  taskName: String!
+  description: String!
+  startDate: DateTime!
+  endDate: DateTime!
+  userId: ID!
+}
+
+input CreateClockInInput {
+  location: CreateLocationInput!
+  time: DateTime!
+}
+
+input CreateLocationInput {
+  type: String!
+  coordinates: [Float!]!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input CreateAdminInput {
+  name: String!
+  email: String!
+  password: String!
+}
+
+input UpdateAdminInput {
+  name: String
+  email: String
+  password: String
+  _id: ID!
+}
