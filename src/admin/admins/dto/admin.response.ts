@@ -18,6 +18,9 @@ export class Admin {
   @Field(() => String)
   email: string;
 
-  @Field()
+  @HideField()
   password: string;
+
+  @Field(() => String)
+  refreshToken: string;
 }

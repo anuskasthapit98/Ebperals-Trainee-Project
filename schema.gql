@@ -8,7 +8,6 @@ type User {
   username: String!
   companyName: String!
   email: String!
-  password: String!
   phone: Float!
   userType: UserType!
 }
@@ -62,7 +61,12 @@ type Admin {
   id: ID!
   name: String!
   email: String!
-  password: String!
+  refreshToken: String!
+}
+
+type Tokens {
+  refreshToken: String!
+  accessToken: String!
 }
 
 type Query {
@@ -70,7 +74,6 @@ type Query {
   projects: [Project!]!
   tasks: [Task!]!
   clockIns: [ClockIn!]!
-  me: Admin!
   admins: [Admin!]!
 }
 
@@ -81,7 +84,8 @@ type Mutation {
   updateProject(updateProjectInput: UpdateProjectInput!): Project!
   createTask(createTaskInput: CreateTaskInput!): Task!
   addClockIn(clockInInput: CreateClockInInput!): ClockIn!
-  login(loginData: LoginInput!): String!
+  loginUser(data: LoginInput!): Tokens!
+  refreshToken(token: String!): Tokens!
   createAdmin(adminInput: CreateAdminInput!): Admin!
   updateAdmin(updateAdminInput: UpdateAdminInput!): Admin!
 }

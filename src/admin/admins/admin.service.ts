@@ -6,23 +6,20 @@ import { CreateAdminInput } from './dto/create-admin.input';
 import { UpdateAdminInput } from './dto/update-admin.input';
 
 import * as bcrypt from 'bcrypt';
+import { AuthService } from '../auth/auth.service';
+import { Tokens } from '../auth/dto/tokens.dto';
 
 @Injectable()
 export class AdminService {
   constructor(
     @InjectModel('Admin') private readonly adminModel: Model<Admin>,
+
   ) {}
 
   async createAdmin(adminInput: CreateAdminInput): Promise<Admin> {
-    const admin = await this.adminModel
-      .findOne({ email: adminInput.email })
-      .exec();
-    if (admin) {
-      throw new NotFoundException(`Admin with this email already exists`);
-    }
-    adminInput.password = await this.encodePassword(adminInput.password);
-    const createAdmin = await this.adminModel.create(adminInput);
-    return createAdmin.save();
+    adminInput.password = await bcrypt.hash(adminInput.password, 10)
+    const createdUser = new this.adminModel(adminInput);
+    return createdUser.save();
   }
 
   async findAll(): Promise<Admin[]> {
@@ -32,7 +29,7 @@ export class AdminService {
 
   async updateAdmin(id: String, updateAdminInput: UpdateAdminInput) {
     const updateAdmin = await this.adminModel
-      .findOneAndUpdate({ _id: id }, { $set: updateAdminInput }, { new: true })
+      .findOneAndUpdate({ _id: id }, updateAdminInput, { new: true })
       .exec();
 
     if (!updateAdmin) {
@@ -60,10 +57,5 @@ export class AdminService {
       throw new NotFoundException(`Admin with email ${email} not found`);
     }
     return admin;
-  }
-
-  private async encodePassword(password: string): Promise<string> {
-    const salt = await bcrypt.genSalt(10);
-    return bcrypt.hash(password, salt);
   }
 }

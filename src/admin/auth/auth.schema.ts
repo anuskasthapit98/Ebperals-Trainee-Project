@@ -9,6 +9,7 @@ export class Auth extends mongoose.Document {
 
   @Prop({ type: String, required: true })
   password: string;
+
 }
 
 export const AuthSchema = SchemaFactory.createForClass(Auth);

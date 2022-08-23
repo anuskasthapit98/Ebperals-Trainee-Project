@@ -3,23 +3,19 @@ import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
-import { JwtStrategy } from './jwt.strategy';
 import { AdminModule } from '../admins/admin.module';
 import { AuthResolver } from './auth.resolver';
+import { AdminSchema } from '../admins/admin.schema';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
     PassportModule,
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: (config: ConfigService) => ({
-        secret: config.get<string>('ACCESS_SECRET'),
-        signOptions: { expiresIn: config.get<string>('ACCESS_EXPIRES_IN') },
-      }),
-      inject: [ConfigService],
-    }),
+    JwtModule,
     AdminModule,
+    MongooseModule.forFeature([{ name: 'Admin', schema: AdminSchema }]),
   ],
-  providers: [AuthResolver, AuthService, JwtStrategy],
+  providers: [AuthResolver, AuthService],
+  exports: [AuthService],
 })
 export class AuthModule {}
