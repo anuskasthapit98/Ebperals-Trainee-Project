@@ -9,32 +9,26 @@ import {
 import { Admin } from '../admins/dto/admin.response';
 import { AuthService } from './auth.service';
 import { LoginInput } from './dto/create-login.input';
-import { CurrentUser } from './decorators/current-user.decorator';
-import {
-  ForbiddenException,
-  InternalServerErrorException,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { JwtGuard } from './guards/jwt.guard';
+import { UnauthorizedException, UseGuards } from '@nestjs/common';
 import { Tokens } from './dto/tokens.dto';
 import { CreateAdminInput } from '../admins/dto/create-admin.input';
-import { AdminService } from '../admins/admin.service';
-import * as bcrypt from 'bcrypt';
+
 import { JwtService } from '@nestjs/jwt';
 
 import { jwtConstants } from 'src/common/helper/jwtConstants';
+import { JwtGuard } from './guards/jwt.guard';
+import { AuthGuard } from '@nestjs/passport';
 @Resolver(() => Admin)
 export class AuthResolver {
   constructor(
     private readonly authService: AuthService,
-    private readonly adminService: AdminService,
     private readonly jwtService: JwtService,
   ) {}
 
   @Mutation(() => Tokens)
-  async loginUser(@Args('data') data: LoginInput): Promise<Tokens> {
+  async addAdmin(@Args('data') data: CreateAdminInput): Promise<Tokens> {
     try {
-      const tokens = await this.authService.loginUser(data);
+      const tokens = await this.authService.addAdmin(data);
       return tokens;
     } catch (err) {
       console.log(err);
@@ -43,26 +37,39 @@ export class AuthResolver {
   }
 
   @Mutation(() => Tokens)
+  async loginAdmin(@Args('data') data: LoginInput): Promise<Tokens> {
+    try {
+      const tokens = await this.authService.loginAdmin(data);
+      return tokens;
+    } catch (err) {
+      console.log(err);
+      throw new UnauthorizedException('Invalid Credentials');
+    }
+  }
+
+  @UseGuards(AuthGuard(jwtConstants.Access))
+  @Mutation(() => Tokens)
   async refreshToken(@Args('token') refreshToken: string): Promise<Tokens> {
     const payload = await this.jwtService.verifyAsync(refreshToken, {
       secret: jwtConstants.secret,
     });
 
-    const user = await this.adminService.findOneByEmail(payload.email);
-    if (!user || !user.refreshToken)
-      throw new ForbiddenException('Unauthorized: Access Denied');
-
-    const refreshTokenMatch = await bcrypt.compare(
-      refreshToken,
-      user.refreshToken,
-    );
-    if (!refreshTokenMatch)
-      throw new ForbiddenException('Unauthorized: Access Denied');
-    try {
-      const tokens = await this.authService.refreshToken(payload.email);
-      if (tokens) return tokens;
-    } catch (err) {
-      throw new InternalServerErrorException('Error in login');
-    }
+    return this.authService.refreshTokens(payload.adminId, refreshToken);
   }
+
+  // @Query(() => Boolean)
+  // public async sendEmailForgotPassword(
+  //   @Args('email') email: String,
+  // ): Promise<Boolean> {
+  //   try {
+  //     var isEmailSent = await this.authService.sendEmailForgotPassword(email);
+  //     if (isEmailSent) {
+  //       return new ResponseSuccess('LOGIN.EMAIL_RESENT', null);
+  //     } else {
+  //       return new ResponseError('REGISTRATION.ERROR.MAIL_NOT_SENT');
+  //     }
+  //   } catch (error) {
+  //     return new ResponseError('LOGIN.ERROR.SEND_EMAIL', error);
+  //   }
+  // }
 }

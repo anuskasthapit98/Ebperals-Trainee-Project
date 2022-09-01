@@ -10,4 +10,5 @@ export class CreateAdminInput {
 
   @Field()
   password: string;
+
 }

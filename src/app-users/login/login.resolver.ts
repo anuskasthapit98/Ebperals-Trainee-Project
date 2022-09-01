@@ -11,7 +11,7 @@ import { AuthService } from './login.service';
 import { LoginInput } from './dto/create-login.input';
 import { CurrentUser } from './current-user.decorator';
 import { UseGuards } from '@nestjs/common';
-import { JwtGuard } from './jwt.guard';
+
 
 @Resolver(() => User)
 export class AuthResolver {
@@ -23,7 +23,7 @@ export class AuthResolver {
   }
 
   @Query(() => User)
-  @UseGuards(JwtGuard)
+  
   me(@CurrentUser() user: User): User {
     return user;
   }

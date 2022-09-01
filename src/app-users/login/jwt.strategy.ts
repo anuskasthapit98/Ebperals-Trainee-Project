@@ -6,9 +6,10 @@ import { AuthService } from './login.service';
 import { User } from '../../admin/users/dto/user.response';
 import { isMongoId } from 'class-validator';
 import { ObjectId } from 'mongodb';
+import { jwtConstants } from 'src/common/helper/jwtConstants';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtStrategy extends PassportStrategy(Strategy,jwtConstants.UserRef) {
   constructor(
     private readonly config: ConfigService,
     private readonly authService: AuthService,

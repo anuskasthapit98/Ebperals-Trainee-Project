@@ -57,16 +57,9 @@ type ClockIn {
   projectId: ID!
 }
 
-type Admin {
-  id: ID!
-  name: String!
-  email: String!
-  refreshToken: String!
-}
-
 type Tokens {
-  refreshToken: String!
   accessToken: String!
+  refreshToken: String!
 }
 
 type Query {
@@ -74,7 +67,6 @@ type Query {
   projects: [Project!]!
   tasks: [Task!]!
   clockIns: [ClockIn!]!
-  admins: [Admin!]!
 }
 
 type Mutation {
@@ -84,10 +76,9 @@ type Mutation {
   updateProject(updateProjectInput: UpdateProjectInput!): Project!
   createTask(createTaskInput: CreateTaskInput!): Task!
   addClockIn(clockInInput: CreateClockInInput!): ClockIn!
-  loginUser(data: LoginInput!): Tokens!
+  addAdmin(data: CreateAdminInput!): Tokens!
+  loginAdmin(data: LoginInput!): Tokens!
   refreshToken(token: String!): Tokens!
-  createAdmin(adminInput: CreateAdminInput!): Admin!
-  updateAdmin(updateAdminInput: UpdateAdminInput!): Admin!
 }
 
 input CreateUserInput {
@@ -146,20 +137,13 @@ input CreateLocationInput {
   coordinates: [Float!]!
 }
 
-input LoginInput {
-  email: String!
-  password: String!
-}
-
 input CreateAdminInput {
   name: String!
   email: String!
   password: String!
 }
 
-input UpdateAdminInput {
-  name: String
-  email: String
-  password: String
-  _id: ID!
+input LoginInput {
+  email: String!
+  password: String!
 }

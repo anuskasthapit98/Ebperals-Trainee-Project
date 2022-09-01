@@ -1,6 +1,10 @@
 import {
   BadRequestException,
+  ForbiddenException,
+  HttpException,
+  HttpStatus,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -14,17 +18,48 @@ import { Model } from 'mongoose';
 import { Tokens } from './dto/tokens.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { jwtConstants } from 'src/common/helper/jwtConstants';
+import { CreateAdminInput } from '../admins/dto/create-admin.input';
+import { ForgotPassword } from './dto/forgot-password.dto';
 
 let saltRounds = 10;
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel('Admin') private readonly adminModel: Model<Admin>,
+    @InjectModel('ForgottenPassword')
+    private readonly forgottenPasswordModel: Model<ForgotPassword>,
     private readonly adminService: AdminService,
     private readonly jwtService: JwtService,
+    private readonly config: ConfigService,
   ) {}
 
-  async logoutUser(email: string): Promise<boolean> {
+  public validateAdmin(id: string): Promise<Admin> {
+    return this.adminService.findOne(id).catch(() => {
+      throw new UnauthorizedException();
+    });
+  }
+
+  async addAdmin(createAdmin: CreateAdminInput): Promise<Tokens> {
+    // Check if user exists
+    const userExists = await this.adminService.findOneByEmail(
+      createAdmin.email,
+    );
+
+    if (userExists) {
+      throw new BadRequestException('User already exists');
+    }
+
+    const newUser = await this.adminService.createAdmin(createAdmin);
+    const payload = {
+      userId: newUser.id,
+      email: newUser.email,
+    };
+    const tokens = await this.createTokens(payload);
+    await this.updateRefreshToken(newUser.id, tokens.refreshToken);
+    return tokens;
+  }
+
+  async logoutAdmin(email: string): Promise<boolean> {
     await this.adminModel.findByIdAndUpdate(
       { email: email },
       { refreshToken: null },
@@ -32,42 +67,29 @@ export class AuthService {
     return true;
   }
 
-  async loginUser(data: LoginInput): Promise<Tokens> {
-    const user = await this.adminService.findOneByEmail(data.email);
+  async loginAdmin(data: LoginInput): Promise<Tokens> {
+    const admin = await this.adminService.findOneByEmail(data.email);
+    if (!admin) return;
 
-    if (!user) return;
-
-    const passwordMatch = await bcrypt.compare(data.password, user.password);
-    console.log(passwordMatch);
+    const passwordMatch = await bcrypt.compare(data.password, admin.password);
     if (!passwordMatch) return;
     else {
       const payload = {
-        userId: user.id,
-        email: user.email,
+        adminId: admin.id,
+        email: admin.email,
       };
-
       const tokens = await this.createTokens(payload);
-
-      await this.updateRefreshToken(user.id, tokens.refreshToken);
+      await this.updateRefreshToken(admin.id, tokens.refreshToken);
+      console.log('loggedin');
       return tokens;
     }
   }
 
-  async updateRefreshToken(
-    userId: string,
-    refreshToken: string,
-  ): Promise<boolean> {
-    const user = await this.adminModel.findById(userId);
-    console.log(user);
+  async updateRefreshToken(adminId: string, refreshToken: string) {
     const hashRefreshToken = await bcrypt.hash(refreshToken, saltRounds);
-    const newUser = await await this.adminModel.findByIdAndUpdate(userId, {
+    await this.adminModel.findByIdAndUpdate(adminId, {
       refreshToken: hashRefreshToken,
     });
-
-    // const newUser = await this.userModel.findById(userId)
-    console.log(await newUser.save());
-
-    return true;
   }
 
   async createTokens(payload: any): Promise<Tokens> {
@@ -84,16 +106,30 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  async refreshToken(email: string): Promise<Tokens> {
-    const tokens = await this.createTokens(email);
+  // async refreshToken(email: string): Promise<Tokens> {
+  //   const tokens = await this.createTokens(email);
+  //   await this.updateRefreshToken(email, tokens.refreshToken);
+  //   return tokens;
+  // }
 
-    await this.updateRefreshToken(email, tokens.refreshToken);
-    return tokens;
+  async refreshTokens(adminId: string, refreshToken: string) {
+    const admin = await this.adminService.findOne(adminId);
+    if (!admin || !admin.refreshToken)
+      throw new ForbiddenException('Access Denied');
+    const refreshTokenMatches = await bcrypt.compare(
+      refreshToken,
+      admin.refreshToken,
+    );
+    if (!refreshTokenMatches) throw new ForbiddenException('Access Denied');
+    const payload = {
+      adminId: admin.id,
+      email: admin.email,
+    };
+    const tokens = await this.createTokens(payload);
+    await this.updateRefreshToken(admin.id, tokens.refreshToken);
+    if (tokens) return tokens;
   }
-
-  public validateAdmin(id: string): Promise<Admin> {
-    return this.adminService.findOne(id).catch(() => {
-      throw new UnauthorizedException();
-    });
+  catch(err) {
+    throw new InternalServerErrorException('Error in login');
   }
 }
