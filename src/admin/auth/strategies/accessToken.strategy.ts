@@ -8,10 +8,7 @@ import { jwtConstants } from 'src/common/helper/jwtConstants';
 import { Admin } from 'src/admin/admins/dto/admin.response';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(
-  Strategy,
-  'jwt',
-) {
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     private readonly config: ConfigService,
     private readonly authService: AuthService,
@@ -22,7 +19,7 @@ export class JwtStrategy extends PassportStrategy(
     });
   }
 
-  validate(payload: any): Promise<Admin> {
+  public validate(payload: any): Promise<Admin> {
     console.log(payload);
     const id = payload.adminId;
     if (!id) throw new UnauthorizedException();

@@ -5,7 +5,7 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 import { jwtConstants } from 'src/common/helper/jwtConstants';
 
 @Injectable()
-export class RefreshJwtGuard extends AuthGuard(jwtConstants.Refresh) {
+export class RefreshJwtGuard extends AuthGuard('refresh-jwt') {
   constructor() {
     super();
   }

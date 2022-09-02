@@ -14,15 +14,14 @@ import { Tokens } from './dto/tokens.dto';
 import { CreateAdminInput } from '../admins/dto/create-admin.input';
 
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
-import { jwtConstants } from 'src/common/helper/jwtConstants';
-import { JwtGuard } from './guards/jwt.guard';
-import { AuthGuard } from '@nestjs/passport';
 @Resolver(() => Admin)
 export class AuthResolver {
   constructor(
     private readonly authService: AuthService,
     private readonly jwtService: JwtService,
+    private config: ConfigService,
   ) {}
 
   @Mutation(() => Tokens)
@@ -47,13 +46,11 @@ export class AuthResolver {
     }
   }
 
-  @UseGuards(AuthGuard(jwtConstants.Access))
   @Mutation(() => Tokens)
   async refreshToken(@Args('token') refreshToken: string): Promise<Tokens> {
     const payload = await this.jwtService.verifyAsync(refreshToken, {
-      secret: jwtConstants.secret,
+      secret: this.config.get<string>('REFRESH_SECRET'),
     });
-
     return this.authService.refreshTokens(payload.adminId, refreshToken);
   }
 

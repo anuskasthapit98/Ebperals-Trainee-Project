@@ -30,7 +30,7 @@ export class AuthService {
     private readonly forgottenPasswordModel: Model<ForgotPassword>,
     private readonly adminService: AdminService,
     private readonly jwtService: JwtService,
-    private readonly config: ConfigService,
+    private config: ConfigService,
   ) {}
 
   public validateAdmin(id: string): Promise<Admin> {
@@ -80,7 +80,6 @@ export class AuthService {
       };
       const tokens = await this.createTokens(payload);
       await this.updateRefreshToken(admin.id, tokens.refreshToken);
-      console.log('loggedin');
       return tokens;
     }
   }
@@ -95,11 +94,11 @@ export class AuthService {
   async createTokens(payload: any): Promise<Tokens> {
     const [accessToken, refreshToken] = await Promise.all([
       await this.jwtService.signAsync(payload, {
-        secret: jwtConstants.secret,
+        secret: this.config.get<string>('ACCESS_SECRET'),
         expiresIn: '15m',
       }),
       await this.jwtService.signAsync(payload, {
-        secret: jwtConstants.secret,
+        secret: this.config.get<string>('REFRESH_SECRET'),
         expiresIn: '90d',
       }),
     ]);

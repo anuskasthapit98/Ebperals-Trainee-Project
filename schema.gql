@@ -67,6 +67,7 @@ type Query {
   projects: [Project!]!
   tasks: [Task!]!
   clockIns: [ClockIn!]!
+  logout(token: String!): Tokens!
 }
 
 type Mutation {

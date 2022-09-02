@@ -9,7 +9,7 @@ import { jwtConstants } from 'src/common/helper/jwtConstants';
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(
   Strategy,
-  jwtConstants.Refresh,
+  'refresh-jwt',
   ) {
     constructor(
       private readonly config: ConfigService,
