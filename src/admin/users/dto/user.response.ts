@@ -36,4 +36,7 @@ export class User {
 
   @Field(() => UserType)
   userType: UserType;
+
+  @Field(() => String)
+  refreshToken: string;
 }

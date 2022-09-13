@@ -2,17 +2,20 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { AuthService } from './login.service';
-import { User } from '../../admin/users/dto/user.response';
+import { UserAuthService } from '../login.service';
+import { User } from '../../../admin/users/dto/user.response';
 import { isMongoId } from 'class-validator';
 import { ObjectId } from 'mongodb';
 import { jwtConstants } from 'src/common/helper/jwtConstants';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy,jwtConstants.UserRef) {
+export class UserJwtStrategy extends PassportStrategy(
+  Strategy,
+  jwtConstants.UserRef,
+) {
   constructor(
     private readonly config: ConfigService,
-    private readonly authService: AuthService,
+    private readonly authService: UserAuthService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -23,6 +26,6 @@ export class JwtStrategy extends PassportStrategy(Strategy,jwtConstants.UserRef)
   public validate(payload: any): Promise<User> {
     const id = payload.sub;
     if (!id && !isMongoId(id)) throw new UnauthorizedException();
-    return this.authService.validateUser(new (id));
+    return this.authService.validateUser(new id());
   }
 }

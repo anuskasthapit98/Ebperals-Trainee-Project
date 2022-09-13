@@ -12,7 +12,7 @@ import { Admin } from '../admins/dto/admin.response';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { AdminService } from '../admins/admin.service';
-import { LoginInput } from './dto/create-login.input';
+import { AdminLoginInput } from './dto/create-login.input';
 import { ConfigService } from '@nestjs/config';
 import { Model } from 'mongoose';
 import { Tokens } from './dto/tokens.dto';
@@ -67,7 +67,7 @@ export class AuthService {
     return true;
   }
 
-  async loginAdmin(data: LoginInput): Promise<Tokens> {
+  async loginAdmin(data: AdminLoginInput): Promise<Tokens> {
     const admin = await this.adminService.findOneByEmail(data.email);
     if (!admin) return;
 
@@ -104,12 +104,6 @@ export class AuthService {
     ]);
     return { accessToken, refreshToken };
   }
-
-  // async refreshToken(email: string): Promise<Tokens> {
-  //   const tokens = await this.createTokens(email);
-  //   await this.updateRefreshToken(email, tokens.refreshToken);
-  //   return tokens;
-  // }
 
   async refreshTokens(adminId: string, refreshToken: string) {
     const admin = await this.adminService.findOne(adminId);

@@ -8,13 +8,14 @@ import {
 } from '@nestjs/graphql';
 import { Admin } from '../admins/dto/admin.response';
 import { AuthService } from './auth.service';
-import { LoginInput } from './dto/create-login.input';
+import { AdminLoginInput } from './dto/create-login.input';
 import { UnauthorizedException, UseGuards } from '@nestjs/common';
 import { Tokens } from './dto/tokens.dto';
 import { CreateAdminInput } from '../admins/dto/create-admin.input';
 
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { CurrentAdmin } from './decorators/current-admin.decorator';
 
 @Resolver(() => Admin)
 export class AuthResolver {
@@ -36,7 +37,7 @@ export class AuthResolver {
   }
 
   @Mutation(() => Tokens)
-  async loginAdmin(@Args('data') data: LoginInput): Promise<Tokens> {
+  async loginAdmin(@Args('data') data: AdminLoginInput): Promise<Tokens> {
     try {
       const tokens = await this.authService.loginAdmin(data);
       return tokens;
@@ -54,19 +55,10 @@ export class AuthResolver {
     return this.authService.refreshTokens(payload.adminId, refreshToken);
   }
 
-  // @Query(() => Boolean)
-  // public async sendEmailForgotPassword(
-  //   @Args('email') email: String,
-  // ): Promise<Boolean> {
-  //   try {
-  //     var isEmailSent = await this.authService.sendEmailForgotPassword(email);
-  //     if (isEmailSent) {
-  //       return new ResponseSuccess('LOGIN.EMAIL_RESENT', null);
-  //     } else {
-  //       return new ResponseError('REGISTRATION.ERROR.MAIL_NOT_SENT');
-  //     }
-  //   } catch (error) {
-  //     return new ResponseError('LOGIN.ERROR.SEND_EMAIL', error);
-  //   }
-  // }
+  @Query(() => Admin)
+  me(@CurrentAdmin() admin: Admin): Admin {
+    return admin;
+  }
+
+
 }

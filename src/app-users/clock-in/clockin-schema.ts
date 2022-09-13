@@ -23,7 +23,7 @@ export class ClockIn extends mongoose.Document {
   time: Date;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
-  userID: User;
+  userId: User;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Project' }] })
   projectId: Project;

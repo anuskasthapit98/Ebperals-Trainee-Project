@@ -30,6 +30,7 @@ export class UsersService {
   }
 
   async updateUser(id: String, updateUserInput: UpdateUserInput) {
+    updateUserInput.password = await this.encodePassword(updateUserInput.password)
     const updateUser = await this.userModel
       .findOneAndUpdate({ _id: id }, { $set: updateUserInput }, { new: true })
       .exec();

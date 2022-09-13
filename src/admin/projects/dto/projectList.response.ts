@@ -6,11 +6,11 @@ import {
   ObjectType,
   PartialType,
 } from '@nestjs/graphql';
-import { IsNotEmpty, IsOptional } from 'class-validator';
+
 import { User } from 'src/admin/users/dto/user.response';
-import { Project } from '../projects.schema';
+
 @ObjectType()
-export class ProjectResponse {
+export class ProjectListResponse {
   @Field(() => ID)
   _id: string;
 
@@ -26,6 +26,6 @@ export class ProjectResponse {
   @Field(() => Date)
   endDate: Date;
 
-  @Field(() => [ID])
-  users: String[];
+  @Field(() => [User])
+  users: User[];
 }

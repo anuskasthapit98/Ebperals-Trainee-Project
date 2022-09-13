@@ -1,38 +1,33 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { ProjectService } from './project.service';
-import { Project } from './dto/project.response';
+import { ProjectResponse } from './dto/project.response';
 import { CreateProjectInput } from './dto/create-project.input';
 import { UpdateProjectInput } from './dto/update-project.input';
 import { UseGuards } from '@nestjs/common';
 import { JwtGuard } from '../auth/guards/jwt.guard';
-import { AuthGuard } from '@nestjs/passport';
-import { jwtConstants } from 'src/common/helper/jwtConstants';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { User } from '../users/dto/user.response';
+import { ProjectListResponse } from './dto/projectList.response';
 
-
-@Resolver(() => Project)
+@Resolver(() => ProjectResponse)
 @UseGuards(JwtGuard)
 export class ProjectResolver {
   constructor(private projectService: ProjectService) {}
 
-
-  @Mutation(() => Project)
+  @Mutation(() => ProjectResponse)
   @UseGuards(JwtGuard)
   async createProject(
     @Args('projectInput') projectInput: CreateProjectInput,
-  ): Promise<Project> {
+  ): Promise<ProjectResponse> {
     const project = await this.projectService.createProject(projectInput);
     return project;
   }
 
-  @Query(() => [Project])
-  async projects(): Promise<Project[]> {
+  @Query(() => [ProjectListResponse])
+  async projects(): Promise<ProjectListResponse[]> {
     const projects = this.projectService.findAll();
     return projects;
   }
 
-  @Mutation(() => Project)
+  @Mutation(() => ProjectResponse)
   updateProject(
     @Args('updateProjectInput') updateProjectInput: UpdateProjectInput,
   ) {

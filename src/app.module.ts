@@ -51,7 +51,7 @@ import { AuthModule } from './admin/auth/auth.module';
     ProjectModule,
     TaskModule,
     ClockInModule,
-    // LoginModule,
+    LoginModule,
     AuthModule,
   ],
   // controllers: [AppController],

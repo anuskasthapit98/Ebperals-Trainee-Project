@@ -10,6 +10,7 @@ type User {
   email: String!
   phone: Float!
   userType: UserType!
+  refreshToken: String!
 }
 
 enum UserType {
@@ -19,7 +20,21 @@ enum UserType {
   TRADIES
 }
 
-type Project {
+type ProjectResponse {
+  _id: ID!
+  projectName: String!
+  description: String!
+  startDate: DateTime!
+  endDate: DateTime!
+  users: [ID!]!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type ProjectListResponse {
   _id: ID!
   projectName: String!
   description: String!
@@ -27,11 +42,6 @@ type Project {
   endDate: DateTime!
   users: [User!]!
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type Task {
   _id: ID!
@@ -57,6 +67,18 @@ type ClockIn {
   projectId: ID!
 }
 
+type UserTokens {
+  accessToken: String!
+  refreshToken: String!
+}
+
+type Admin {
+  id: ID!
+  name: String!
+  email: String!
+  refreshToken: String!
+}
+
 type Tokens {
   accessToken: String!
   refreshToken: String!
@@ -64,22 +86,23 @@ type Tokens {
 
 type Query {
   users: [User!]!
-  projects: [Project!]!
+  projects: [ProjectListResponse!]!
   tasks: [Task!]!
   clockIns: [ClockIn!]!
-  logout(token: String!): Tokens!
+  me: Admin!
 }
 
 type Mutation {
   createUser(userInput: CreateUserInput!): User!
   updateUser(updateUserInput: UpdateUserInput!): User!
-  createProject(projectInput: CreateProjectInput!): Project!
-  updateProject(updateProjectInput: UpdateProjectInput!): Project!
+  createProject(projectInput: CreateProjectInput!): ProjectResponse!
+  updateProject(updateProjectInput: UpdateProjectInput!): ProjectResponse!
   createTask(createTaskInput: CreateTaskInput!): Task!
   addClockIn(clockInInput: CreateClockInInput!): ClockIn!
-  addAdmin(data: CreateAdminInput!): Tokens!
-  loginAdmin(data: LoginInput!): Tokens!
+  loginUser(data: UserLoginInput!): UserTokens!
   refreshToken(token: String!): Tokens!
+  addAdmin(data: CreateAdminInput!): Tokens!
+  loginAdmin(data: AdminLoginInput!): Tokens!
 }
 
 input CreateUserInput {
@@ -108,7 +131,7 @@ input CreateProjectInput {
   description: String!
   startDate: DateTime!
   endDate: DateTime!
-  users: [CreateUserInput!]!
+  users: [ID!]!
 }
 
 input UpdateProjectInput {
@@ -116,7 +139,7 @@ input UpdateProjectInput {
   description: String
   startDate: DateTime
   endDate: DateTime
-  users: [CreateUserInput!]
+  users: [ID!]
   _id: String!
 }
 
@@ -131,11 +154,18 @@ input CreateTaskInput {
 input CreateClockInInput {
   location: CreateLocationInput!
   time: DateTime!
+  userId: ID!
+  projectId: ID!
 }
 
 input CreateLocationInput {
   type: String!
   coordinates: [Float!]!
+}
+
+input UserLoginInput {
+  email: String!
+  password: String!
 }
 
 input CreateAdminInput {
@@ -144,7 +174,7 @@ input CreateAdminInput {
   password: String!
 }
 
-input LoginInput {
+input AdminLoginInput {
   email: String!
   password: String!
 }
