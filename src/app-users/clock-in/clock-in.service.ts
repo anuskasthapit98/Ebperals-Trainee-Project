@@ -14,9 +14,9 @@ export class ClockInService {
     CurrentUser: any,
     clockIn: CreateClockInInput,
   ): Promise<ClockIn> {
-    console.log(CurrentUser);
-    clockIn.userId = CurrentUser.userId;
-    const addClockInData = await this.clockInModel.create(clockIn);
+    const userId = CurrentUser._id;
+    const newClockIn = { ...clockIn, userId };
+    const addClockInData = await this.clockInModel.create(newClockIn);
     return addClockInData.save();
   }
 

@@ -18,8 +18,5 @@ export class CreateClockInInput {
   time: Date;
 
   @Field(() => ID)
-  userId: string;
-
-  @Field(() => ID)
   projectId: string;
 }

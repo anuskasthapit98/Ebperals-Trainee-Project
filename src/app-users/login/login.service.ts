@@ -41,8 +41,9 @@ export class UserAuthService {
     if (!passwordMatch) return;
     else {
       const payload = {
-        sub: user.id,
+        userId: user.id,
         email: user.email,
+        userType: user.userType,
       };
       const tokens = await this.createTokens(payload);
       await this.updateRefreshToken(user.id, tokens.refreshToken);

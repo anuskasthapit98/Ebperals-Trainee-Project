@@ -7,9 +7,11 @@ export class ForgotPassword extends mongoose.Document {
   @Prop({ type: String })
   email: string;
 
-  @Prop({ type: String })
-  newPasswordToken: string;
+  @Prop({ type: String, default: 'H@l0Password' })
+  emailToken: string;
 
+  @Prop({ type: Date })
+  timestamp: Date;
 }
 
 export const ForgottenPasswordSchema =

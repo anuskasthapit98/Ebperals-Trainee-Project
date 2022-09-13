@@ -14,6 +14,7 @@ import { UnauthorizedException, UseGuards } from '@nestjs/common';
 import { UserTokens } from './dto/tokens.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { UserJwtGuard } from './guards/jwt.guard';
 
 @Resolver(() => User)
 export class UserAuthResolver {
@@ -43,7 +44,8 @@ export class UserAuthResolver {
   }
 
   @Query(() => User)
-  me(@CurrentUser() user: User): User {
+  @UseGuards(UserJwtGuard)
+  User(@CurrentUser() user: User): User {
     return user;
   }
 }

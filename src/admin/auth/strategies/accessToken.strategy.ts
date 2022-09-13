@@ -3,8 +3,6 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from '../auth.service';
-
-import { jwtConstants } from 'src/common/helper/jwtConstants';
 import { Admin } from 'src/admin/admins/dto/admin.response';
 
 @Injectable()
@@ -20,7 +18,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   public validate(payload: any): Promise<Admin> {
-    console.log(payload);
     const id = payload.adminId;
     if (!id) throw new UnauthorizedException();
     return this.authService.validateAdmin(id);

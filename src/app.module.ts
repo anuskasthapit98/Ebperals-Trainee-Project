@@ -15,13 +15,6 @@ import { AuthModule } from './admin/auth/auth.module';
 
 @Module({
   imports: [
-    // MongooseModule.forRoot('mongodb://localhost/nest'),
-    // GraphQLModule.forRoot<ApolloDriverConfig>({
-    //   driver: ApolloDriver,
-    //   autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-    //   sortSchema: true,
-    // }),
-
     ConfigModule.forRoot({
       envFilePath: `.env.${process.env.NODE_ENV || 'dev'}`,
       isGlobal: true,

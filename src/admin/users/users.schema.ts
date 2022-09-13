@@ -31,6 +31,9 @@ export class User extends mongoose.Document {
 
   @Prop({ type: String, enum: Object.values(UserType) })
   userType: string;
+
+  @Prop({ type: String })
+  refreshToken: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

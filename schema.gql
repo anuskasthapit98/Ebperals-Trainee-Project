@@ -77,6 +77,9 @@ type Admin {
   name: String!
   email: String!
   refreshToken: String!
+  token: String!
+  otp: String!
+  otpCreatedAt: String!
 }
 
 type Tokens {
@@ -84,11 +87,29 @@ type Tokens {
   refreshToken: String!
 }
 
+type ChangePasswordStatus {
+  status: Boolean!
+}
+
+type ResetPasswordToken {
+  token: String!
+}
+
+type ForgetPasswordTokens {
+  token: String!
+  accessToken: String!
+}
+
+type GenerateOtp {
+  otp: String!
+}
+
 type Query {
   users: [User!]!
   projects: [ProjectListResponse!]!
   tasks: [Task!]!
   clockIns: [ClockIn!]!
+  User: User!
   me: Admin!
 }
 
@@ -103,6 +124,10 @@ type Mutation {
   refreshToken(token: String!): Tokens!
   addAdmin(data: CreateAdminInput!): Tokens!
   loginAdmin(data: AdminLoginInput!): Tokens!
+  changePassword(data: ChangePasswordInput!): ChangePasswordStatus!
+  resetPassword(data: AdminLoginInput!): ResetPasswordToken!
+  forgetPassword(data: AdminOtpInput!): ForgetPasswordTokens!
+  generateOtp(data: String!): GenerateOtp!
 }
 
 input CreateUserInput {
@@ -148,13 +173,12 @@ input CreateTaskInput {
   description: String!
   startDate: DateTime!
   endDate: DateTime!
-  userId: ID!
+  projectId: ID!
 }
 
 input CreateClockInInput {
   location: CreateLocationInput!
   time: DateTime!
-  userId: ID!
   projectId: ID!
 }
 
@@ -177,4 +201,15 @@ input CreateAdminInput {
 input AdminLoginInput {
   email: String!
   password: String!
+}
+
+input ChangePasswordInput {
+  email: String!
+  token: String!
+  password: String!
+}
+
+input AdminOtpInput {
+  email: String!
+  otp: String!
 }

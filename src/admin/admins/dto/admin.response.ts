@@ -23,4 +23,13 @@ export class Admin {
 
   @Field(() => String)
   refreshToken: string;
+
+  @Field(() => String)
+  token?: String;
+
+  @Field(() => String)
+  otp?: String;
+
+  @Field(() => String)
+  otpCreatedAt?: String;
 }

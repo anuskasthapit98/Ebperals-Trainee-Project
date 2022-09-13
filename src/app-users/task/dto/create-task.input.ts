@@ -16,5 +16,5 @@ export class CreateTaskInput {
   endDate: Date;
 
   @Field(() => ID)
-  userId: string;
+  projectId: string;
 }

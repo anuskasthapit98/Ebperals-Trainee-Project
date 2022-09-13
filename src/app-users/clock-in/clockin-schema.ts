@@ -19,13 +19,13 @@ export class ClockIn extends mongoose.Document {
   @Prop({ type: LocationSchema })
   location: Location;
 
-  @Prop({ type: String })
+  @Prop({ type: Date })
   time: Date;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   userId: User;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Project' }] })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Project' })
   projectId: Project;
 }
 

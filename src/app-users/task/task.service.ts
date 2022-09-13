@@ -9,8 +9,13 @@ export class TaskService {
   constructor(@InjectModel('Task') private readonly TaskModel: Model<Task>) {}
 
   // Create new Task
-  async createTask(TaskInput: CreateTaskInput): Promise<Task> {
-    const createTask = await this.TaskModel.create(TaskInput);
+  async createTask(
+    CurrentUser: any,
+    TaskInput: CreateTaskInput,
+  ): Promise<Task> {
+    const userId = CurrentUser._id;
+    const task = { ...TaskInput, userId };
+    const createTask = await this.TaskModel.create(task);
     return createTask.save();
   }
 

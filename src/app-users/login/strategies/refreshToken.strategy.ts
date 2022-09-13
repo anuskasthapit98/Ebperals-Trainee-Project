@@ -4,12 +4,11 @@ import { Request } from 'express';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { UserAuthService } from '../login.service';
-import { jwtConstants } from 'src/common/helper/jwtConstants';
 
 @Injectable()
 export class UserRefreshTokenStrategy extends PassportStrategy(
   Strategy,
-  jwtConstants.Refresh,
+  'jwt-user-refresh',
 ) {
   constructor(
     private readonly config: ConfigService,

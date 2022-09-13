@@ -6,6 +6,8 @@ import { LoginSchema } from './schemas/login.schema';
 import { UsersModule } from 'src/admin/users/users.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
+import { UserJwtStrategy } from './strategies/jwt.strategy';
+import { UserRefreshTokenStrategy } from './strategies/refreshToken.strategy';
 
 @Module({
   imports: [
@@ -14,6 +16,11 @@ import { JwtModule } from '@nestjs/jwt';
     PassportModule,
     JwtModule.register({}),
   ],
-  providers: [UserAuthService, UserAuthResolver],
+  providers: [
+    UserAuthService,
+    UserAuthResolver,
+    UserJwtStrategy,
+    UserRefreshTokenStrategy,
+  ],
 })
 export class LoginModule {}

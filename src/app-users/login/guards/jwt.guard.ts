@@ -5,10 +5,10 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { jwtConstants } from 'src/common/helper/jwtConstants';
+
 
 @Injectable()
-export class JwtGuard extends AuthGuard(jwtConstants.UserRef) {
+export class UserJwtGuard extends AuthGuard('jwt-user') {
   getRequest(context: ExecutionContext) {
     const ctx = GqlExecutionContext.create(context);
     return ctx.getContext().req;
