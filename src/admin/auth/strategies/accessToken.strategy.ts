@@ -20,6 +20,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   public validate(payload: any): Promise<Admin> {
     const id = payload.adminId;
     if (!id) throw new UnauthorizedException();
-    return this.authService.validateAdmin(id);
+
+    const data = this.authService.validateAdmin(id);
+
+    return data;
   }
 }

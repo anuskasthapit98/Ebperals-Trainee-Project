@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, ObjectId } from 'mongoose';
+import mongoose, { Model, ObjectId } from 'mongoose';
 import { ProjectResponse } from './dto/project.response';
 import { CreateProjectInput } from './dto/create-project.input';
 import { UpdateProjectInput } from './dto/update-project.input';
@@ -47,11 +47,38 @@ export class ProjectService {
     return projects;
   }
 
-  async findOne(id: String) {
-    const project = await this.projectModel.findOne({ _id: id }).exec();
-    if (!project) {
-      throw new NotFoundException(`Project ${id} not found`);
-    }
+  async findOne(id: string) {
+    const project = await this.projectModel.aggregate([
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(id),
+        },
+      },
+
+      {
+        $lookup: {
+          from: 'users',
+          let: { userId: '$users' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $in: ['$_id', '$$userId'],
+                },
+              },
+            },
+          ],
+          as: 'users',
+        },
+      },
+    ]);
+
+    // const projectById = await this.projectModel.findOne({ _id: id }).exec();
+    // if (!projectById) {
+    //   throw new NotFoundException(`Project ${id} not found`);
+    // }
+    // console.log(projectById);
+
     return project;
   }
 

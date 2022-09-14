@@ -27,6 +27,13 @@ export class ProjectResolver {
     return projects;
   }
 
+  @Query(() => ProjectListResponse)
+  @UseGuards(JwtGuard)
+  async findProjectById(@Args('id') id: string): Promise<ProjectListResponse> {
+    const [project] = await this.projectService.findOne(id);
+    return project;
+  }
+
   @Mutation(() => ProjectResponse)
   updateProject(
     @Args('updateProjectInput') updateProjectInput: UpdateProjectInput,

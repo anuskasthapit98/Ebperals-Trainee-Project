@@ -1,4 +1,5 @@
 import { SetMetadata } from '@nestjs/common';
+import { UserType } from 'src/admin/users/users.schema';
 
-export const UserType = (...userType: string[]) =>
-  SetMetadata('userType', userType);
+export const HasUserType = (...userTypes: UserType[]) =>
+  SetMetadata('userTypes', userTypes);

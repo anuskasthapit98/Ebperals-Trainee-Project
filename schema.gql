@@ -87,30 +87,21 @@ type Tokens {
   refreshToken: String!
 }
 
-type ChangePasswordStatus {
-  status: Boolean!
-}
-
-type ResetPasswordToken {
-  token: String!
-}
-
-type ForgetPasswordTokens {
-  token: String!
-  accessToken: String!
-}
-
-type GenerateOtp {
-  otp: String!
+type Test {
+  """Example field (placeholder)"""
+  exampleField: Int!
 }
 
 type Query {
   users: [User!]!
   projects: [ProjectListResponse!]!
+  findProjectById(id: String!): ProjectListResponse!
   tasks: [Task!]!
   clockIns: [ClockIn!]!
   User: User!
   me: Admin!
+  tests: [Test!]!
+  test(id: Int!): Test!
 }
 
 type Mutation {
@@ -124,10 +115,9 @@ type Mutation {
   refreshToken(token: String!): Tokens!
   addAdmin(data: CreateAdminInput!): Tokens!
   loginAdmin(data: AdminLoginInput!): Tokens!
-  changePassword(data: ChangePasswordInput!): ChangePasswordStatus!
-  resetPassword(data: AdminLoginInput!): ResetPasswordToken!
-  forgetPassword(data: AdminOtpInput!): ForgetPasswordTokens!
-  generateOtp(data: String!): GenerateOtp!
+  createTest(createTestInput: CreateTestInput!): Test!
+  updateTest(updateTestInput: UpdateTestInput!): Test!
+  removeTest(id: Int!): Test!
 }
 
 input CreateUserInput {
@@ -203,13 +193,13 @@ input AdminLoginInput {
   password: String!
 }
 
-input ChangePasswordInput {
-  email: String!
-  token: String!
-  password: String!
+input CreateTestInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
 }
 
-input AdminOtpInput {
-  email: String!
-  otp: String!
+input UpdateTestInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
 }

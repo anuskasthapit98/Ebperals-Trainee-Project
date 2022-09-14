@@ -38,7 +38,7 @@ export class UserAuthResolver {
   @Mutation(() => UserTokens)
   async refreshToken(@Args('token') refreshToken: string): Promise<UserTokens> {
     const payload = await this.jwtService.verifyAsync(refreshToken, {
-      secret: this.config.get<string>('REFRESH_SECRET'),
+      secret: this.config.get<string>('USER_REFRESH_SECRET'),
     });
     return this.authService.refreshTokens(payload.userId, refreshToken);
   }

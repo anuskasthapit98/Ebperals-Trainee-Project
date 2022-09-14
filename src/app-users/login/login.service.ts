@@ -61,11 +61,11 @@ export class UserAuthService {
   async createTokens(payload: any): Promise<UserTokens> {
     const [accessToken, refreshToken] = await Promise.all([
       await this.jwtService.signAsync(payload, {
-        secret: this.config.get<string>('ACCESS_SECRET'),
+        secret: this.config.get<string>('USER_ACCESS_SECRET'),
         expiresIn: '15m',
       }),
       await this.jwtService.signAsync(payload, {
-        secret: this.config.get<string>('REFRESH_SECRET'),
+        secret: this.config.get<string>('USER_REFRESH_SECRET'),
         expiresIn: '90d',
       }),
     ]);

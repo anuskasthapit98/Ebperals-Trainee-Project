@@ -36,8 +36,11 @@ export class AdminService {
     return admin.remove();
   }
 
-  async findOneByEmail(email: string) {
+  async findAdminByEmail(email: string) {
     const admin = await this.adminModel.findOne({ email: email }).exec();
+    if (!admin) {
+      throw new NotFoundException(`admin ${email} not found`);
+    }
     return admin;
   }
 }

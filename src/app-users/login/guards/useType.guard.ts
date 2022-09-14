@@ -1,37 +1,26 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Context } from '@nestjs/graphql';
-import { Observable } from 'rxjs';
+import { GqlExecutionContext } from '@nestjs/graphql';
+import { UserType } from 'src/admin/users/users.schema';
 
 @Injectable()
-export class UserTypeGuard implements CanActivate {
-  constructor(private readonly reflector: Reflector) {}
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
-    const userType = this.reflector.get<string[]>(
-      'userType',
-      context.getHandler(),
+export class RolesGuard implements CanActivate {
+  constructor(private reflector: Reflector) {}
+
+  canActivate(context: ExecutionContext): boolean {
+    const requiredUserType = this.reflector.getAllAndOverride<UserType[]>(
+      'userTypes',
+      [context.getHandler(), context.getClass()],
     );
-    if (!userType) {
+
+    if (!requiredUserType) {
       return true;
     }
-    const req = context.switchToHttp().getRequest();
-    const user = req.user;
-    const hasUserType = () =>
-      user.userType.some((userType) => userType.indexOf(userType) > -1);
-    let hasPermission = false;
+    const ctx = GqlExecutionContext.create(context);
+    const user = ctx.getContext().req.user;
 
-    if (hasUserType()) {
-      hasPermission = true;
-      if (req.params.email || req.body.email) {
-        if (
-          req.user.email != req.params.email &&
-          req.user.email != req.body.email
-        ) {
-          hasPermission = false;
-        }
-      }
-    }
+    return requiredUserType.some((userType) =>
+      user?.userType?.includes(userType),
+    );
   }
 }
