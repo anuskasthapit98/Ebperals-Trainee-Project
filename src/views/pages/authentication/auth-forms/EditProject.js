@@ -13,7 +13,7 @@ import { useMutation, HttpLink, ApolloClient, InMemoryCache, useQuery } from '@a
 // project imports
 import useScriptRef from 'hooks/useScriptRef';
 import AnimateButton from 'ui-component/extended/AnimateButton';
-import { CREATE_PROJECT } from 'gqloperations/mutations';
+import { UPDATE_PROJECT } from 'gqloperations/mutations';
 import { USERS } from 'gqloperations/queries';
 
 // ===========================|| FIREBASE - REGISTER ||=========================== //
@@ -28,7 +28,7 @@ const MenuProps = {
     }
 };
 
-const AddProject = () => {
+const EditProject = ({ edit, editData }) => {
     const client = new ApolloClient({
         link: new HttpLink({
             uri: 'http://localhost:3000/graphql'
@@ -37,12 +37,11 @@ const AddProject = () => {
     });
     const theme = useTheme();
     const scriptedRef = useScriptRef();
-    const [createProject] = useMutation(CREATE_PROJECT);
+    const [updateProject] = useMutation(UPDATE_PROJECT);
     const { data, loading, error } = useQuery(USERS);
     if (loading) return 'Loading...';
     if (error) return <pre>{error.message}</pre>;
 
-    console.log(data);
     const users = data.users.map((users) => users);
 
     const handleSelect = (selected) => {
@@ -55,10 +54,10 @@ const AddProject = () => {
         <>
             <Formik
                 initialValues={{
-                    projectName: '',
-                    description: '',
-                    startDate: '',
-                    endDate: '',
+                    projectName: editData?.findProjectById.projectName,
+                    description: editData?.findProjectById.description,
+                    startDate: editData?.findProjectById.startDate,
+                    endDate: editData?.findProjectById.endDate,
                     users: [],
                     submit: null
                 }}
@@ -71,22 +70,27 @@ const AddProject = () => {
                 })}
                 onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                     try {
-                        const projectName = values.projectName;
-                        const description = values.description;
-                        const startDate = values.startDate;
-                        const endDate = values.endDate;
-                        const users = values.users;
+                        const id = editData.findProjectById._id;
+                        const value = { ...values, id };
+
+                        const projectName = value.projectName;
+                        const description = value.description;
+                        const startDate = value.startDate;
+                        const endDate = value.endDate;
+                        const users = value.users;
+                        const _id = value.id;
 
                         await client
                             .mutate({
                                 variables: {
+                                    _id,
                                     projectName,
                                     description,
                                     startDate,
                                     endDate,
                                     users
                                 },
-                                mutation: CREATE_PROJECT
+                                mutation: UPDATE_PROJECT
                             })
                             .then(
                                 () => {
@@ -125,6 +129,7 @@ const AddProject = () => {
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                                 inputProps={{}}
+                                value={values.projectName}
                             />
                             {touched.projectName && errors.projectName && (
                                 <FormHelperText error id="standard-weight-helper-text--register">
@@ -147,6 +152,7 @@ const AddProject = () => {
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                                 inputProps={{}}
+                                value={values.description}
                             />
                             {touched.description && errors.description && (
                                 <FormHelperText error id="standard-weight-helper-text--register">
@@ -251,7 +257,7 @@ const AddProject = () => {
                                     variant="contained"
                                     color="secondary"
                                 >
-                                    Add Project
+                                    Edit Project
                                 </Button>
                             </AnimateButton>
                         </Box>
@@ -262,4 +268,4 @@ const AddProject = () => {
     );
 };
 
-export default AddProject;
+export default EditProject;

@@ -1,7 +1,5 @@
 // material-ui
 import { useTheme } from '@mui/material/styles';
-
-// material-ui
 import { Divider, Grid, Stack, Typography, useMediaQuery } from '@mui/material';
 
 // project imports

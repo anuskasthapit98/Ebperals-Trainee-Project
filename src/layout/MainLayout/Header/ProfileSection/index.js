@@ -58,7 +58,7 @@ const ProfileSection = () => {
     const anchorRef = useRef(null);
     const handleLogout = async () => {
         try {
-            await logout();
+            window.location.href = '/login';
         } catch (err) {
             console.error(err);
         }
@@ -170,7 +170,7 @@ const ProfileSection = () => {
                                                 </Stack>
                                                 <Typography variant="subtitle2">Project Admin</Typography>
                                             </Stack>
-                                            <OutlinedInput
+                                            {/* <OutlinedInput
                                                 sx={{ width: '100%', pr: 1, pl: 2, my: 2 }}
                                                 id="input-search-profile"
                                                 value={value}
@@ -185,12 +185,12 @@ const ProfileSection = () => {
                                                 inputProps={{
                                                     'aria-label': 'weight'
                                                 }}
-                                            />
+                                            /> */}
                                             <Divider />
                                         </Box>
                                         <PerfectScrollbar style={{ height: '100%', maxHeight: 'calc(100vh - 250px)', overflowX: 'hidden' }}>
                                             <Box sx={{ p: 2, pt: 0 }}>
-                                                <UpgradePlanCard />
+                                                {/* <UpgradePlanCard />
                                                 <Divider />
                                                 <Card
                                                     sx={{
@@ -236,7 +236,7 @@ const ProfileSection = () => {
                                                             </Grid>
                                                         </Grid>
                                                     </CardContent>
-                                                </Card>
+                                                </Card> */}
                                                 <Divider />
                                                 <List
                                                     component="nav"
@@ -264,12 +264,12 @@ const ProfileSection = () => {
                                                         </ListItemIcon>
                                                         <ListItemText primary={<Typography variant="body2">Account Settings</Typography>} />
                                                     </ListItemButton>
-                                                    <ListItemButton
+                                                    {/* <ListItemButton
                                                         sx={{ borderRadius: `${borderRadius}px` }}
                                                         selected={selectedIndex === 1}
                                                         onClick={(event) => handleListItemClick(event, 1, '/user/social-profile/posts')}
-                                                    >
-                                                        <ListItemIcon>
+                                                    > */}
+                                                    {/* <ListItemIcon>
                                                             <IconUser stroke={1.5} size="20px" />
                                                         </ListItemIcon>
                                                         <ListItemText
@@ -293,8 +293,8 @@ const ProfileSection = () => {
                                                                     </Grid>
                                                                 </Grid>
                                                             }
-                                                        />
-                                                    </ListItemButton>
+                                                        /> */}
+                                                    {/* </ListItemButton> */}
                                                     <ListItemButton
                                                         sx={{ borderRadius: `${borderRadius}px` }}
                                                         selected={selectedIndex === 4}

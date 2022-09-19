@@ -166,20 +166,27 @@ const FirebaseRegister = () => {
                         const name = values.name;
                         console.log(values.email);
                         console.log(values.password);
-                        await client.mutate({
-                            variables: {
-                                email,
-                                password,
-                                name
-                            },
-                            mutation: SUBMIT_POST
-                        });
-
-                        if (scriptedRef.current) {
-                            setStatus({ success: true });
-
-                            setSubmitting(false);
-                        }
+                        await client
+                            .mutate({
+                                variables: {
+                                    email,
+                                    password,
+                                    name
+                                },
+                                mutation: SUBMIT_POST
+                            })
+                            .then(
+                                () => {
+                                    window.location.href = '/login';
+                                },
+                                (err) => {
+                                    if (scriptedRef.current) {
+                                        setStatus({ success: false });
+                                        setErrors({ submit: err.message });
+                                        setSubmitting(false);
+                                    }
+                                }
+                            );
                     } catch (err) {
                         console.error(err);
                         if (scriptedRef.current) {

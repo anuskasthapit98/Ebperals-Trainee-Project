@@ -1,15 +1,12 @@
 import PropTypes from 'prop-types';
-import * as React from 'react';
+import { useEffect, useState } from 'react';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import {
     Box,
-    CardContent,
     Checkbox,
-    Grid,
     IconButton,
-    InputAdornment,
     Table,
     TableBody,
     TableCell,
@@ -18,26 +15,21 @@ import {
     TablePagination,
     TableRow,
     TableSortLabel,
-    TextField,
     Toolbar,
     Tooltip,
     Typography
 } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
-import { useMutation, gql, HttpLink, ApolloClient, InMemoryCache, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 
 // project imports
-import Chip from 'ui-component/extended/Chip';
 import MainCard from 'ui-component/cards/MainCard';
-import { useDispatch, useSelector } from 'store';
-import { getCustomers } from 'store/slices/customer';
+import { PROJECTS } from 'gqloperations/queries';
 
 // assets
 import DeleteIcon from '@mui/icons-material/Delete';
-
-import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
-import Items from '../kanban/Backlogs/Items';
+import ProjectEdit from './ProjectEditModal';
 
 // table sort
 function descendingComparator(a, b, orderBy) {
@@ -202,43 +194,30 @@ EnhancedTableToolbar.propTypes = {
     numSelected: PropTypes.number.isRequired
 };
 
-// ==============================|| CUSTOMER LIST ||============================== //
-const PROJECTS = gql`
-    query {
-        projects {
-            _id
-            projectName
-            description
-            startDate
-            endDate
-            users {
-                name
-                username
-                companyName
-                email
-                userType
-                phone
-            }
-        }
-    }
-`;
-const CustomerList = () => {
+const ProjectList = () => {
     const { data, loading, error } = useQuery(PROJECTS);
     const theme = useTheme();
-    const dispatch = useDispatch();
-    const [edit, setEdit] = React.useState(false);
-    const [order, setOrder] = React.useState('asc');
-    const [orderBy, setOrderBy] = React.useState('calories');
-    const [selected, setSelected] = React.useState([]);
-    const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(5);
-    const [search, setSearch] = React.useState('');
-    const [rows, setRows] = React.useState([]);
+    const [order, setOrder] = useState('asc');
+    const [orderBy, setOrderBy] = useState('calories');
+    const [selected, setSelected] = useState([]);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [search, setSearch] = useState('');
+    const [rows, setRows] = useState();
+    const [selectedId, setSelectedId] = useState('');
+    // open modal to edit review
+    const [open, setOpen] = useState(false);
+    const [edit, setEdit] = useState(false);
 
-    const projectList = data?.projects.map((items) => items);
-    React.useEffect(() => {
+    const handleCloseModal = () => {
+        setEdit(false);
+        setOpen(false);
+    };
+
+    useEffect(() => {
+        const projectList = data?.projects.map((items) => items);
         setRows(projectList);
-    }, []);
+    }, [data]);
 
     if (loading) return 'Loading...';
     if (error) return <pre>{error.message}</pre>;
@@ -267,7 +246,7 @@ const CustomerList = () => {
             });
             setRows(newRows);
         } else {
-            setRows(projectList);
+            // setRows(projectList);
         }
     };
 
@@ -316,110 +295,122 @@ const CustomerList = () => {
 
     const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
-    const handleEdit = () => {
-        setEdit(true);
-        if (edit) {
-            console.log('editing');
-        }
-    };
-
     return (
         <MainCard content={false}>
-            {/* table */}
-            <TableContainer>
-                <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle">
-                    <EnhancedTableHead
-                        theme={theme}
-                        numSelected={selected.length}
-                        order={order}
-                        orderBy={orderBy}
-                        onSelectAllClick={handleSelectAllClick}
-                        onRequestSort={handleRequestSort}
-                        rowCount={rows.length}
-                        selected={selected}
-                    />
-                    <TableBody>
-                        {stableSort(rows, getComparator(order, orderBy))
-                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                            .map((row, index) => {
-                                /** Make sure no display bugs if row isn't an OrderData object */
-                                if (typeof row === 'number') return null;
-                                const isItemSelected = isSelected(row.projectName);
-                                const labelId = `enhanced-table-checkbox-${index}`;
+            {rows && (
+                <>
+                    <TableContainer>
+                        <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle">
+                            <EnhancedTableHead
+                                theme={theme}
+                                numSelected={selected.length}
+                                order={order}
+                                orderBy={orderBy}
+                                onSelectAllClick={handleSelectAllClick}
+                                onRequestSort={handleRequestSort}
+                                rowCount={rows.length}
+                                selected={selected}
+                            />
+                            <TableBody>
+                                {stableSort(rows, getComparator(order, orderBy))
+                                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                    .map((row, index) => {
+                                        /** Make sure no display bugs if row isn't an OrderData object */
+                                        if (typeof row === 'number') return null;
+                                        const isItemSelected = isSelected(row.projectName);
+                                        const labelId = `enhanced-table-checkbox-${index}`;
 
-                                return (
-                                    <TableRow
-                                        hover
-                                        role="checkbox"
-                                        aria-checked={isItemSelected}
-                                        tabIndex={-1}
-                                        key={index}
-                                        selected={isItemSelected}
-                                    >
-                                        <TableCell padding="checkbox" sx={{ pl: 3 }} onClick={(event) => handleClick(event, row.id)}>
-                                            <Checkbox
-                                                color="primary"
-                                                checked={isItemSelected}
-                                                inputProps={{
-                                                    'aria-labelledby': labelId
-                                                }}
-                                            />
-                                        </TableCell>
-                                        <TableCell
-                                            component="th"
-                                            id={labelId}
-                                            scope="row"
-                                            onClick={(event) => handleClick(event, row.name)}
-                                            sx={{ cursor: 'pointer' }}
-                                        >
-                                            <Typography
-                                                variant="subtitle1"
-                                                sx={{ color: theme.palette.mode === 'dark' ? 'grey.600' : 'grey.900' }}
+                                        return (
+                                            <TableRow
+                                                hover
+                                                role="checkbox"
+                                                aria-checked={isItemSelected}
+                                                tabIndex={-1}
+                                                key={index}
+                                                selected={isItemSelected}
                                             >
-                                                {' '}
-                                                {row.projectName}{' '}
-                                            </Typography>
-                                        </TableCell>
-                                        <TableCell>{row.description} </TableCell>
-                                        <TableCell align="right">{row.startDate.substring(0, 10)}.</TableCell>
-                                        <TableCell align="center">{row.endDate.substring(0, 10)}</TableCell>
+                                                <TableCell
+                                                    padding="checkbox"
+                                                    sx={{ pl: 3 }}
+                                                    onClick={(event) => handleClick(event, row.id)}
+                                                >
+                                                    <Checkbox
+                                                        color="primary"
+                                                        checked={isItemSelected}
+                                                        inputProps={{
+                                                            'aria-labelledby': labelId
+                                                        }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell
+                                                    component="th"
+                                                    id={labelId}
+                                                    scope="row"
+                                                    onClick={(event) => handleClick(event, row.name)}
+                                                    sx={{ cursor: 'pointer' }}
+                                                >
+                                                    <Typography
+                                                        variant="subtitle1"
+                                                        sx={{ color: theme.palette.mode === 'dark' ? 'grey.600' : 'grey.900' }}
+                                                    >
+                                                        {' '}
+                                                        {row.projectName}{' '}
+                                                    </Typography>
+                                                </TableCell>
+                                                <TableCell>{row.description} </TableCell>
+                                                <TableCell align="right">{row.startDate.substring(0, 10)}.</TableCell>
+                                                <TableCell align="center">{row.endDate.substring(0, 10)}</TableCell>
 
-                                        <TableCell align="center">
-                                            {row.users ? row.users.map((item) => item.name).toString() : '-'}
-                                        </TableCell>
-                                        <TableCell align="center" sx={{ pr: 3 }}>
-                                            <IconButton color="secondary" size="large">
-                                                <EditTwoToneIcon sx={{ fontSize: '1.3rem' }} onClick={handleEdit} />
-                                            </IconButton>
-                                        </TableCell>
+                                                <TableCell align="center">
+                                                    {row.users ? row.users.map((item) => item.name).toString() : '-'}
+                                                </TableCell>
+                                                <TableCell align="center" sx={{ pr: 3 }}>
+                                                    <IconButton color="secondary" size="large">
+                                                        <EditTwoToneIcon
+                                                            sx={{ fontSize: '1.3rem' }}
+                                                            onClick={(e) => {
+                                                                setSelectedId(row._id);
+                                                                setOpen(true);
+                                                            }}
+                                                        />
+                                                    </IconButton>
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })}
+                                {emptyRows > 0 && (
+                                    <TableRow
+                                        style={{
+                                            height: 53 * emptyRows
+                                        }}
+                                    >
+                                        <TableCell colSpan={6} />
                                     </TableRow>
-                                );
-                            })}
-                        {emptyRows > 0 && (
-                            <TableRow
-                                style={{
-                                    height: 53 * emptyRows
-                                }}
-                            >
-                                <TableCell colSpan={6} />
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+                                )}
+                            </TableBody>
+                        </Table>
+                        <ProjectEdit
+                            open={open}
+                            handleCloseModal={handleCloseModal}
+                            selectedId={selectedId}
+                            edit={edit}
+                            setEdit={setEdit}
+                        />
+                    </TableContainer>
 
-            {/* table pagination */}
-            <TablePagination
-                rowsPerPageOptions={[5, 10, 25]}
-                component="div"
-                count={rows.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-            />
+                    <TablePagination
+                        rowsPerPageOptions={[5, 10, 25]}
+                        component="div"
+                        count={rows.length}
+                        rowsPerPage={rowsPerPage}
+                        page={page}
+                        onPageChange={handleChangePage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                    />
+                </>
+            )}
         </MainCard>
     );
 };
 
-export default CustomerList;
+export default ProjectList;

@@ -1,15 +1,12 @@
 import PropTypes from 'prop-types';
-import * as React from 'react';
+import { useEffect, useState } from 'react';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import {
     Box,
-    CardContent,
     Checkbox,
-    Grid,
     IconButton,
-    InputAdornment,
     Table,
     TableBody,
     TableCell,
@@ -18,24 +15,20 @@ import {
     TablePagination,
     TableRow,
     TableSortLabel,
-    TextField,
     Toolbar,
     Tooltip,
     Typography
 } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
-import { useMutation, gql, HttpLink, ApolloClient, InMemoryCache, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 
 // project imports
-import Chip from 'ui-component/extended/Chip';
 import MainCard from 'ui-component/cards/MainCard';
-import { useDispatch, useSelector } from 'store';
-import { getCustomers } from 'store/slices/customer';
+import UserEdit from './UserEditModal';
+import { USERS } from 'gqloperations/queries';
 
 // assets
 import DeleteIcon from '@mui/icons-material/Delete';
-
-import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 
 // table sort
@@ -53,7 +46,7 @@ const getComparator = (order, orderBy) =>
     order === 'desc' ? (a, b) => descendingComparator(a, b, orderBy) : (a, b) => -descendingComparator(a, b, orderBy);
 
 function stableSort(array, comparator) {
-    const stabilizedThis = array.map((el, index) => [el, index]);
+    const stabilizedThis = array?.map((el, index) => [el, index]);
     stabilizedThis.sort((a, b) => {
         const order = comparator(a[0], b[0]);
         if (order !== 0) return order;
@@ -80,7 +73,7 @@ const headCells = [
         id: 'email',
         numeric: true,
         label: 'Email Address',
-        align: 'left'
+        align: 'center'
     },
     {
         id: 'userType',
@@ -207,41 +200,32 @@ EnhancedTableToolbar.propTypes = {
     numSelected: PropTypes.number.isRequired
 };
 
-// ==============================|| CUSTOMER LIST ||============================== //
-const USERS = gql`
-    query {
-        users {
-            id
-            name
-            username
-            companyName
-            email
-            phone
-            userType
-        }
-    }
-`;
-
-const CustomerList = () => {
+const UsersList = () => {
     const theme = useTheme();
-
-    const [order, setOrder] = React.useState('asc');
-    const [orderBy, setOrderBy] = React.useState('calories');
-    const [selected, setSelected] = React.useState([]);
-    const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(5);
-    const [search, setSearch] = React.useState('');
-    const [rows, setRows] = React.useState([]);
-
+    const [order, setOrder] = useState('asc');
+    const [orderBy, setOrderBy] = useState('calories');
+    const [selected, setSelected] = useState([]);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [search, setSearch] = useState('');
     const { data, loading, error } = useQuery(USERS);
+    const [rows, setRows] = useState();
+    const [selectedId, setSelectedId] = useState('');
+    // open modal to edit review
+    const [open, setOpen] = useState(false);
+    const [edit, setEdit] = useState(false);
 
-    React.useEffect(() => {
+    const handleCloseModal = () => {
+        setEdit(false);
+        setOpen(false);
+    };
+
+    useEffect(() => {
         const userList = data?.users.map((items) => items);
         setRows(userList);
-    }, []);
+    }, [data]);
 
     if (loading) return 'Loading...';
-    console.log(data);
     if (error) return <pre>{error.message}</pre>;
 
     const handleSearch = (event) => {
@@ -268,7 +252,7 @@ const CustomerList = () => {
             });
             setRows(newRows);
         } else {
-            // setRows(projectList);
+            // setRows(userList);
         }
     };
 
@@ -319,102 +303,117 @@ const CustomerList = () => {
 
     return (
         <MainCard content={false}>
-            {/* table */}
-            <TableContainer>
-                <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle">
-                    <EnhancedTableHead
-                        theme={theme}
-                        numSelected={selected.length}
-                        order={order}
-                        orderBy={orderBy}
-                        onSelectAllClick={handleSelectAllClick}
-                        onRequestSort={handleRequestSort}
-                        rowCount={rows.length}
-                        selected={selected}
-                    />
-                    <TableBody>
-                        {stableSort(rows, getComparator(order, orderBy))
-                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                            .map((row, index) => {
-                                /** Make sure no display bugs if row isn't an OrderData object */
-                                if (typeof row === 'number') return null;
-                                const isItemSelected = isSelected(row.name);
-                                const labelId = `enhanced-table-checkbox-${index}`;
+            {rows && (
+                <>
+                    <TableContainer>
+                        <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle">
+                            <EnhancedTableHead
+                                theme={theme}
+                                numSelected={selected.length}
+                                order={order}
+                                orderBy={orderBy}
+                                onSelectAllClick={handleSelectAllClick}
+                                onRequestSort={handleRequestSort}
+                                rowCount={rows.length}
+                                selected={selected}
+                            />
+                            <TableBody>
+                                {stableSort(rows, getComparator(order, orderBy))
+                                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                    .map((row, index) => {
+                                        /** Make sure no display bugs if row isn't an OrderData object */
+                                        if (typeof row === 'number') return null;
+                                        const isItemSelected = isSelected(row.name);
+                                        const labelId = `enhanced-table-checkbox-${index}`;
 
-                                return (
+                                        return (
+                                            <>
+                                                <TableRow
+                                                    hover
+                                                    role="checkbox"
+                                                    aria-checked={isItemSelected}
+                                                    tabIndex={-1}
+                                                    key={index}
+                                                    selected={isItemSelected}
+                                                >
+                                                    <TableCell
+                                                        padding="checkbox"
+                                                        sx={{ pl: 3 }}
+                                                        onClick={(event) => handleClick(event, row.id)}
+                                                    >
+                                                        <Checkbox
+                                                            color="primary"
+                                                            checked={isItemSelected}
+                                                            inputProps={{
+                                                                'aria-labelledby': labelId
+                                                            }}
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell
+                                                        component="th"
+                                                        id={labelId}
+                                                        scope="row"
+                                                        onClick={(event) => handleClick(event, row.name)}
+                                                        sx={{ cursor: 'pointer' }}
+                                                    >
+                                                        <Typography
+                                                            variant="subtitle1"
+                                                            sx={{ color: theme.palette.mode === 'dark' ? 'grey.600' : 'grey.900' }}
+                                                        >
+                                                            {' '}
+                                                            {row.name}{' '}
+                                                        </Typography>
+                                                    </TableCell>
+                                                    <TableCell>{row.username} </TableCell>
+                                                    <TableCell align="center">{row.email}</TableCell>
+                                                    <TableCell align="center">{row.userType}</TableCell>
+                                                    <TableCell align="center">{row.companyName}</TableCell>
+                                                    <TableCell align="center">{row.phone}</TableCell>
+                                                    <TableCell align="center" sx={{ pr: 3 }}>
+                                                        <IconButton
+                                                            color="secondary"
+                                                            size="large"
+                                                            onClick={(e) => {
+                                                                setSelectedId(row.id);
+                                                                setOpen(true);
+                                                            }}
+                                                        >
+                                                            <EditTwoToneIcon sx={{ fontSize: '1.3rem' }} />
+                                                        </IconButton>
+                                                    </TableCell>
+                                                </TableRow>
+                                            </>
+                                        );
+                                    })}
+                                {emptyRows > 0 && (
                                     <TableRow
-                                        hover
-                                        role="checkbox"
-                                        aria-checked={isItemSelected}
-                                        tabIndex={-1}
-                                        key={index}
-                                        selected={isItemSelected}
+                                        style={{
+                                            height: 53 * emptyRows
+                                        }}
                                     >
-                                        <TableCell padding="checkbox" sx={{ pl: 3 }} onClick={(event) => handleClick(event, row.id)}>
-                                            <Checkbox
-                                                color="primary"
-                                                checked={isItemSelected}
-                                                inputProps={{
-                                                    'aria-labelledby': labelId
-                                                }}
-                                            />
-                                        </TableCell>
-                                        <TableCell
-                                            component="th"
-                                            id={labelId}
-                                            scope="row"
-                                            onClick={(event) => handleClick(event, row.name)}
-                                            sx={{ cursor: 'pointer' }}
-                                        >
-                                            <Typography
-                                                variant="subtitle1"
-                                                sx={{ color: theme.palette.mode === 'dark' ? 'grey.600' : 'grey.900' }}
-                                            >
-                                                {' '}
-                                                {row.name}{' '}
-                                            </Typography>
-                                        </TableCell>
-                                        <TableCell>{row.username} </TableCell>
-                                        <TableCell align="center">{row.email}</TableCell>
-                                        <TableCell align="center">{row.userType}</TableCell>
-                                        <TableCell align="center">{row.companyName}</TableCell>
-                                        <TableCell align="center">{row.phone}</TableCell>
-                                        <TableCell align="center" sx={{ pr: 3 }}>
-                                            <IconButton color="primary" size="large">
-                                                <VisibilityTwoToneIcon sx={{ fontSize: '1.3rem' }} />
-                                            </IconButton>
-                                            <IconButton color="secondary" size="large">
-                                                <EditTwoToneIcon sx={{ fontSize: '1.3rem' }} />
-                                            </IconButton>
-                                        </TableCell>
+                                        <TableCell colSpan={6} />
                                     </TableRow>
-                                );
-                            })}
-                        {emptyRows > 0 && (
-                            <TableRow
-                                style={{
-                                    height: 53 * emptyRows
-                                }}
-                            >
-                                <TableCell colSpan={6} />
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+                                )}
+                            </TableBody>
+                        </Table>
 
-            {/* table pagination */}
-            <TablePagination
-                rowsPerPageOptions={[5, 10, 25]}
-                component="div"
-                count={rows.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-            />
+                        <UserEdit open={open} handleCloseModal={handleCloseModal} selectedId={selectedId} edit={edit} setEdit={setEdit} />
+                    </TableContainer>
+
+                    {/* table pagination */}
+                    <TablePagination
+                        rowsPerPageOptions={[5, 10, 25]}
+                        component="div"
+                        count={rows.length}
+                        rowsPerPage={rowsPerPage}
+                        page={page}
+                        onPageChange={handleChangePage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                    />
+                </>
+            )}
         </MainCard>
     );
 };
 
-export default CustomerList;
+export default UsersList;

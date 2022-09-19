@@ -14,7 +14,7 @@ import useScriptRef from 'hooks/useScriptRef';
 import AnimateButton from 'ui-component/extended/AnimateButton';
 import { CREATE_USER, UPDATE_USER } from 'gqloperations/mutations';
 
-const AddUser = () => {
+const EditUser = ({ edit, editData }) => {
     const client = new ApolloClient({
         link: new HttpLink({
             uri: 'http://localhost:3000/graphql'
@@ -23,7 +23,7 @@ const AddUser = () => {
     });
     const theme = useTheme();
     const scriptedRef = useScriptRef();
-    const { loading, error } = useMutation(CREATE_USER);
+    const { loading, error } = useMutation(UPDATE_USER);
     if (loading) return 'Loading...';
     if (error) return <pre>{error.message}</pre>;
 
@@ -31,12 +31,12 @@ const AddUser = () => {
         <>
             <Formik
                 initialValues={{
-                    companyName: '',
-                    email: '',
-                    name: '',
-                    phone: null,
-                    username: '',
-                    userType: '',
+                    companyName: editData?.findUserById.companyName,
+                    email: editData?.findUserById.email,
+                    name: editData?.findUserById.name,
+                    phone: editData?.findUserById.phone,
+                    username: editData?.findUserById.username,
+                    userType: editData?.findUserById.userType,
                     submit: null
                 }}
                 validationSchema={Yup.object().shape({
@@ -49,16 +49,20 @@ const AddUser = () => {
                 })}
                 onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                     try {
-                        const companyName = values.companyName;
-                        const email = values.email;
-                        const name = values.name;
-                        const username = values.username;
-                        const phone = parseInt(values.phone, 10);
-                        const userType = values.userType;
+                        const id = editData.findUserById.id;
+                        const value = { ...values, id };
 
+                        const companyName = value.companyName;
+                        const email = value.email;
+                        const name = value.name;
+                        const username = value.username;
+                        const phone = parseInt(value.phone, 10);
+                        const userType = value.userType;
+                        const _id = value.id;
                         await client
                             .mutate({
                                 variables: {
+                                    _id,
                                     name,
                                     username,
                                     companyName,
@@ -67,7 +71,7 @@ const AddUser = () => {
                                     userType
                                 },
 
-                                mutation: CREATE_USER
+                                mutation: UPDATE_USER
                             })
                             .then(
                                 () => {
@@ -106,6 +110,7 @@ const AddUser = () => {
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                                 inputProps={{}}
+                                value={values.companyName}
                             />
                             {touched.companyName && errors.companyName && (
                                 <FormHelperText error id="standard-weight-helper-text--compnayName">
@@ -124,6 +129,7 @@ const AddUser = () => {
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                                 inputProps={{}}
+                                value={values.name}
                             />
                             {touched.name && errors.name && (
                                 <FormHelperText error id="standard-weight-helper-text--name">
@@ -145,6 +151,7 @@ const AddUser = () => {
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                                 inputProps={{}}
+                                value={values.username}
                             />
                             {touched.username && errors.username && (
                                 <FormHelperText error id="standard-weight-helper-text--username">
@@ -162,6 +169,7 @@ const AddUser = () => {
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                                 inputProps={{}}
+                                value={values.email}
                             />
                             {touched.email && errors.email && (
                                 <FormHelperText error id="standard-weight-helper-text--email">
@@ -179,6 +187,7 @@ const AddUser = () => {
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                                 inputProps={{}}
+                                value={values.phone}
                             />
                             {touched.phone && errors.phone && (
                                 <FormHelperText error id="standard-weight-helper-text--phone">
@@ -235,7 +244,7 @@ const AddUser = () => {
                                     variant="contained"
                                     color="secondary"
                                 >
-                                    Add User
+                                    Edit User
                                 </Button>
                             </AnimateButton>
                         </Box>
@@ -246,4 +255,9 @@ const AddUser = () => {
     );
 };
 
-export default AddUser;
+EditUser.propTypes = {
+    edit: PropTypes.bool,
+    editData: PropTypes.object
+};
+
+export default EditUser;
