@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import { Box, Button, FormControl, FormHelperText, InputLabel, OutlinedInput, TextField, Select, Chip, MenuItem } from '@mui/material';
@@ -36,6 +38,8 @@ const AddProject = () => {
         cache: new InMemoryCache()
     });
     const theme = useTheme();
+    const [valueBasic, setValueBasic] = useState(new Date());
+    const [valueBasicEnd, setValueBasicEnd] = useState(new Date());
     const scriptedRef = useScriptRef();
     const [createProject] = useMutation(CREATE_PROJECT);
     const { data, loading, error } = useQuery(USERS);
@@ -162,11 +166,13 @@ const AddProject = () => {
                         >
                             <LocalizationProvider dateAdapter={AdapterDateFns}>
                                 <DateTimePicker
+                                    disablePast
                                     id="outlined-adornment-project-start"
                                     name="startDate"
                                     renderInput={(props) => <TextField fullWidth {...props} helperText="" />}
-                                    value={values.startDate}
+                                    value={valueBasic}
                                     onChange={(dateFromValue) => {
+                                        setValueBasic(dateFromValue);
                                         setFieldValue('startDate', dateFromValue.toISOString());
                                     }}
                                 />
@@ -182,11 +188,13 @@ const AddProject = () => {
                         <FormControl fullWidth error={Boolean(touched.endDate && errors.endDate)} sx={{ ...theme.typography.customInput }}>
                             <LocalizationProvider dateAdapter={AdapterDateFns}>
                                 <DateTimePicker
+                                    disablePast
                                     id="outlined-adornment-project-start"
                                     name="endDate"
                                     renderInput={(props) => <TextField fullWidth {...props} helperText="" />}
-                                    value={values.endDate}
+                                    value={valueBasicEnd}
                                     onChange={(dateFromValue) => {
+                                        setValueBasicEnd(dateFromValue);
                                         setFieldValue('endDate', dateFromValue.toISOString());
                                     }}
                                 />

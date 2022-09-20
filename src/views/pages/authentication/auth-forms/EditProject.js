@@ -1,6 +1,18 @@
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import { Box, Button, FormControl, FormHelperText, InputLabel, OutlinedInput, TextField, Select, Chip, MenuItem } from '@mui/material';
+import {
+    Box,
+    Button,
+    FormControl,
+    FormHelperText,
+    InputLabel,
+    OutlinedInput,
+    TextField,
+    Select,
+    Chip,
+    MenuItem,
+    Grid
+} from '@mui/material';
 
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -28,7 +40,7 @@ const MenuProps = {
     }
 };
 
-const EditProject = ({ edit, editData }) => {
+const EditProject = ({ edit, editData, handleCloseModal }) => {
     const client = new ApolloClient({
         link: new HttpLink({
             uri: 'http://localhost:3000/graphql'
@@ -168,6 +180,7 @@ const EditProject = ({ edit, editData }) => {
                         >
                             <LocalizationProvider dateAdapter={AdapterDateFns}>
                                 <DateTimePicker
+                                    disablePast
                                     id="outlined-adornment-project-start"
                                     name="startDate"
                                     renderInput={(props) => <TextField fullWidth {...props} helperText="" />}
@@ -188,6 +201,7 @@ const EditProject = ({ edit, editData }) => {
                         <FormControl fullWidth error={Boolean(touched.endDate && errors.endDate)} sx={{ ...theme.typography.customInput }}>
                             <LocalizationProvider dateAdapter={AdapterDateFns}>
                                 <DateTimePicker
+                                    disablePast
                                     id="outlined-adornment-project-start"
                                     name="endDate"
                                     renderInput={(props) => <TextField fullWidth {...props} helperText="" />}
@@ -246,20 +260,33 @@ const EditProject = ({ edit, editData }) => {
                             </Box>
                         )}
 
-                        <Box sx={{ mt: 2 }}>
-                            <AnimateButton>
-                                <Button
-                                    disableElevation
-                                    disabled={isSubmitting}
-                                    fullWidth
-                                    size="large"
-                                    type="submit"
-                                    variant="contained"
-                                    color="secondary"
-                                >
-                                    Edit Project
-                                </Button>
-                            </AnimateButton>
+                        <Box sx={{ width: '100%' }}>
+                            <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+                                <Grid item xs={6}>
+                                    <Button
+                                        disableElevation
+                                        disabled={isSubmitting}
+                                        fullWidth
+                                        size="large"
+                                        type="submit"
+                                        variant="contained"
+                                        color="secondary"
+                                    >
+                                        Edit Project
+                                    </Button>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <Button fullWidth size="large" variant="contained" color="primary" onClick={handleCloseModal}>
+                                        Close
+                                    </Button>
+                                </Grid>
+                                {/* <Grid item xs={6}>
+                                    <Item>3</Item>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <Item>4</Item>
+                                </Grid> */}
+                            </Grid>
                         </Box>
                     </form>
                 )}
