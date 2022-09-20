@@ -42,7 +42,7 @@ const AddProject = () => {
     if (loading) return 'Loading...';
     if (error) return <pre>{error.message}</pre>;
 
-    console.log(data);
+    // console.log(data);
     const users = data.users.map((users) => users);
 
     const handleSelect = (selected) => {

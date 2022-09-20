@@ -68,21 +68,7 @@ const UserEdit = ({ open, handleCloseModal, selectedId, edit, setEdit }) => {
                                     <AuthCardWrapper sx={style}>
                                         <Grid container spacing={2} alignItems="center" justifyContent="center">
                                             <Grid item xs={12}>
-                                                <EditUser edit={edit} editData={data} />
-                                            </Grid>
-                                        </Grid>
-                                        <></>
-                                        <Grid container spacing={2} alignItems="center" justifyContent="center">
-                                            <Grid item xs={12}>
-                                                <Button
-                                                    fullWidth
-                                                    size="large"
-                                                    variant="contained"
-                                                    color="primary"
-                                                    onClick={handleCloseModal}
-                                                >
-                                                    Close
-                                                </Button>
+                                                <EditUser edit={edit} editData={data} handleCloseModal={handleCloseModal} />
                                             </Grid>
                                         </Grid>
                                     </AuthCardWrapper>

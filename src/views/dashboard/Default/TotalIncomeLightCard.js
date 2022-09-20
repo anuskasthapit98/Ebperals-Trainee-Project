@@ -3,13 +3,16 @@ import PropTypes from 'prop-types';
 // material-ui
 import { useTheme, styled } from '@mui/material/styles';
 import { Avatar, Box, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
-
+import { useQuery } from '@apollo/client';
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import TotalIncomeCard from 'ui-component/cards/Skeleton/TotalIncomeCard';
+import { PROJECTS } from 'gqloperations/queries';
+import { useEffect, useState } from 'react';
 
 // assets
 import StorefrontTwoToneIcon from '@mui/icons-material/StorefrontTwoTone';
+import DescriptionIcon from '@mui/icons-material/Description';
 
 // styles
 const CardWrapper = styled(MainCard)(({ theme }) => ({
@@ -41,53 +44,66 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 
 const TotalIncomeLightCard = ({ isLoading }) => {
     const theme = useTheme();
+    const [rows, setRows] = useState();
+    const { data, loading, error } = useQuery(PROJECTS);
+
+    useEffect(() => {
+        const projectList = data?.projects.map((items) => items);
+        setRows(projectList);
+    }, [data]);
+
+    if (loading) return 'Loading...';
+    if (error) return <pre>{error.message}</pre>;
 
     return (
         <>
             {isLoading ? (
                 <TotalIncomeCard />
             ) : (
-                <CardWrapper border={false} content={false}>
-                    <Box sx={{ p: 2 }}>
-                        <List sx={{ py: 0 }}>
-                            <ListItem alignItems="center" disableGutters sx={{ py: 0 }}>
-                                <ListItemAvatar>
-                                    <Avatar
-                                        variant="rounded"
-                                        sx={{
-                                            ...theme.typography.commonAvatar,
-                                            ...theme.typography.largeAvatar,
-                                            backgroundColor:
-                                                theme.palette.mode === 'dark' ? theme.palette.dark.main : theme.palette.warning.light,
-                                            color: theme.palette.mode === 'dark' ? theme.palette.warning.dark : theme.palette.warning.dark
-                                        }}
-                                    >
-                                        <StorefrontTwoToneIcon fontSize="inherit" />
-                                    </Avatar>
-                                </ListItemAvatar>
-                                <ListItemText
-                                    sx={{
-                                        py: 0,
-                                        mt: 0.45,
-                                        mb: 0.45
-                                    }}
-                                    primary={<Typography variant="h4">$203k</Typography>}
-                                    secondary={
-                                        <Typography
-                                            variant="subtitle2"
+                rows && (
+                    <CardWrapper border={false} content={false}>
+                        <Box sx={{ p: 2 }}>
+                            <List sx={{ py: 0 }}>
+                                <ListItem alignItems="center" disableGutters sx={{ py: 0 }}>
+                                    <ListItemAvatar>
+                                        <Avatar
+                                            variant="rounded"
                                             sx={{
-                                                color: theme.palette.grey[500],
-                                                mt: 0.5
+                                                ...theme.typography.commonAvatar,
+                                                ...theme.typography.largeAvatar,
+                                                backgroundColor:
+                                                    theme.palette.mode === 'dark' ? theme.palette.dark.main : theme.palette.warning.light,
+                                                color:
+                                                    theme.palette.mode === 'dark' ? theme.palette.warning.dark : theme.palette.warning.dark
                                             }}
                                         >
-                                            Total Income
-                                        </Typography>
-                                    }
-                                />
-                            </ListItem>
-                        </List>
-                    </Box>
-                </CardWrapper>
+                                            <DescriptionIcon fontSize="inherit" />
+                                        </Avatar>
+                                    </ListItemAvatar>
+                                    <ListItemText
+                                        sx={{
+                                            py: 0,
+                                            mt: 0.45,
+                                            mb: 0.45
+                                        }}
+                                        primary={<Typography variant="h4">{rows.length}</Typography>}
+                                        secondary={
+                                            <Typography
+                                                variant="subtitle2"
+                                                sx={{
+                                                    color: theme.palette.grey[500],
+                                                    mt: 0.5
+                                                }}
+                                            >
+                                                Total Projects
+                                            </Typography>
+                                        }
+                                    />
+                                </ListItem>
+                            </List>
+                        </Box>
+                    </CardWrapper>
+                )
             )}
         </>
     );

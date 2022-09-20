@@ -2,7 +2,7 @@
 
 /* eslint no-underscore-dangle: 0 */
 import { useTheme } from '@mui/material/styles';
-import { Box, Button, FormControl, FormHelperText, InputLabel, OutlinedInput, Select, MenuItem } from '@mui/material';
+import { Box, Button, FormControl, FormHelperText, InputLabel, OutlinedInput, Select, MenuItem, Grid } from '@mui/material';
 
 // third party
 import * as Yup from 'yup';
@@ -14,7 +14,13 @@ import useScriptRef from 'hooks/useScriptRef';
 import AnimateButton from 'ui-component/extended/AnimateButton';
 import { CREATE_USER, UPDATE_USER } from 'gqloperations/mutations';
 
-const EditUser = ({ edit, editData }) => {
+// const Item = styled()(({ theme }) => ({
+//     padding: theme.spacing(1),
+//     textAlign: 'center',
+//     color: theme.palette.text.secondary
+// }));
+
+const EditUser = ({ edit, editData, handleCloseModal }) => {
     const client = new ApolloClient({
         link: new HttpLink({
             uri: 'http://localhost:3000/graphql'
@@ -233,7 +239,36 @@ const EditUser = ({ edit, editData }) => {
                             </Box>
                         )}
 
-                        <Box sx={{ mt: 2 }}>
+                        <Box sx={{ width: '100%' }}>
+                            <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+                                <Grid item xs={6}>
+                                    <Button
+                                        disableElevation
+                                        disabled={isSubmitting}
+                                        fullWidth
+                                        size="large"
+                                        type="submit"
+                                        variant="contained"
+                                        color="secondary"
+                                    >
+                                        Edit User
+                                    </Button>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <Button fullWidth size="large" variant="contained" color="primary" onClick={handleCloseModal}>
+                                        Close
+                                    </Button>
+                                </Grid>
+                                {/* <Grid item xs={6}>
+                                    <Item>3</Item>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <Item>4</Item>
+                                </Grid> */}
+                            </Grid>
+                        </Box>
+
+                        {/* <Box sx={{ mt: 2 }}>
                             <AnimateButton>
                                 <Button
                                     disableElevation
@@ -246,8 +281,11 @@ const EditUser = ({ edit, editData }) => {
                                 >
                                     Edit User
                                 </Button>
+                                <Button fullWidth size="large" variant="contained" color="primary" onClick={handleCloseModal}>
+                                    Close
+                                </Button>
                             </AnimateButton>
-                        </Box>
+                        </Box> */}
                     </form>
                 )}
             </Formik>
@@ -257,7 +295,8 @@ const EditUser = ({ edit, editData }) => {
 
 EditUser.propTypes = {
     edit: PropTypes.bool,
-    editData: PropTypes.object
+    editData: PropTypes.object,
+    handleCloseModal: PropTypes.func
 };
 
 export default EditUser;

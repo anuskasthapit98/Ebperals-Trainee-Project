@@ -1,15 +1,17 @@
 import PropTypes from 'prop-types';
+import { useEffect, useState } from 'react';
 // material-ui
 import { styled, useTheme } from '@mui/material/styles';
 import { Avatar, Box, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
+import { useQuery } from '@apollo/client';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import TotalIncomeCard from 'ui-component/cards/Skeleton/TotalIncomeCard';
+import { USERS } from 'gqloperations/queries';
 
 // assets
-import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
-
+import GroupIcon from '@mui/icons-material/Group';
 // styles
 const CardWrapper = styled(MainCard)(({ theme }) => ({
     backgroundColor: theme.palette.primary.dark,
@@ -42,50 +44,62 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 
 const TotalIncomeDarkCard = ({ isLoading }) => {
     const theme = useTheme();
+    const [rows, setRows] = useState();
+    const { data, loading, error } = useQuery(USERS);
+
+    useEffect(() => {
+        const userList = data?.users.map((items) => items);
+        setRows(userList);
+    }, [data]);
+
+    if (loading) return 'Loading...';
+    if (error) return <pre>{error.message}</pre>;
 
     return (
         <>
             {isLoading ? (
                 <TotalIncomeCard />
             ) : (
-                <CardWrapper border={false} content={false}>
-                    <Box sx={{ p: 2 }}>
-                        <List sx={{ py: 0 }}>
-                            <ListItem alignItems="center" disableGutters sx={{ py: 0 }}>
-                                <ListItemAvatar>
-                                    <Avatar
-                                        variant="rounded"
+                rows && (
+                    <CardWrapper border={false} content={false}>
+                        <Box sx={{ p: 2 }}>
+                            <List sx={{ py: 0 }}>
+                                <ListItem alignItems="center" disableGutters sx={{ py: 0 }}>
+                                    <ListItemAvatar>
+                                        <Avatar
+                                            variant="rounded"
+                                            sx={{
+                                                ...theme.typography.commonAvatar,
+                                                ...theme.typography.largeAvatar,
+                                                backgroundColor: theme.palette.primary[800],
+                                                color: '#fff'
+                                            }}
+                                        >
+                                            <GroupIcon fontSize="inherit" />
+                                        </Avatar>
+                                    </ListItemAvatar>
+                                    <ListItemText
                                         sx={{
-                                            ...theme.typography.commonAvatar,
-                                            ...theme.typography.largeAvatar,
-                                            backgroundColor: theme.palette.primary[800],
-                                            color: '#fff'
+                                            py: 0,
+                                            mt: 0.45,
+                                            mb: 0.45
                                         }}
-                                    >
-                                        <TableChartOutlinedIcon fontSize="inherit" />
-                                    </Avatar>
-                                </ListItemAvatar>
-                                <ListItemText
-                                    sx={{
-                                        py: 0,
-                                        mt: 0.45,
-                                        mb: 0.45
-                                    }}
-                                    primary={
-                                        <Typography variant="h4" sx={{ color: '#fff' }}>
-                                            $203k
-                                        </Typography>
-                                    }
-                                    secondary={
-                                        <Typography variant="subtitle2" sx={{ color: 'primary.light', mt: 0.25 }}>
-                                            Total Income
-                                        </Typography>
-                                    }
-                                />
-                            </ListItem>
-                        </List>
-                    </Box>
-                </CardWrapper>
+                                        primary={
+                                            <Typography variant="h4" sx={{ color: '#fff' }}>
+                                                {rows.length}
+                                            </Typography>
+                                        }
+                                        secondary={
+                                            <Typography variant="subtitle2" sx={{ color: 'primary.light', mt: 0.25 }}>
+                                                Total Users
+                                            </Typography>
+                                        }
+                                    />
+                                </ListItem>
+                            </List>
+                        </Box>
+                    </CardWrapper>
+                )
             )}
         </>
     );
