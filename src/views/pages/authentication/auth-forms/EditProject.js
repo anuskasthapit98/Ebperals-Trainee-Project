@@ -180,7 +180,6 @@ const EditProject = ({ edit, editData, handleCloseModal }) => {
                         >
                             <LocalizationProvider dateAdapter={AdapterDateFns}>
                                 <DateTimePicker
-                                    disablePast
                                     id="outlined-adornment-project-start"
                                     name="startDate"
                                     renderInput={(props) => <TextField fullWidth {...props} helperText="" />}
@@ -201,7 +200,6 @@ const EditProject = ({ edit, editData, handleCloseModal }) => {
                         <FormControl fullWidth error={Boolean(touched.endDate && errors.endDate)} sx={{ ...theme.typography.customInput }}>
                             <LocalizationProvider dateAdapter={AdapterDateFns}>
                                 <DateTimePicker
-                                    disablePast
                                     id="outlined-adornment-project-start"
                                     name="endDate"
                                     renderInput={(props) => <TextField fullWidth {...props} helperText="" />}
