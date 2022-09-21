@@ -73,7 +73,7 @@ const FirebaseLogin = ({ loginProp }) => {
     return (
         <>
             <Grid container direction="column" justifyContent="center" spacing={2}>
-                <Grid item xs={12}>
+                {/* <Grid item xs={12}>
                     <Box
                         sx={{
                             alignItems: 'center',
@@ -105,12 +105,12 @@ const FirebaseLogin = ({ loginProp }) => {
 
                         <Divider sx={{ flexGrow: 1 }} orientation="horizontal" />
                     </Box>
-                </Grid>
-                <Grid item xs={12} container alignItems="center" justifyContent="center">
+                </Grid> */}
+                {/* <Grid item xs={12} container alignItems="center" justifyContent="center">
                     <Box sx={{ mb: 2 }}>
                         <Typography variant="subtitle1">Sign in with Email address</Typography>
                     </Box>
-                </Grid>
+                </Grid> */}
             </Grid>
 
             <Formik
@@ -226,7 +226,7 @@ const FirebaseLogin = ({ loginProp }) => {
                                 }
                                 label="Remember me"
                             />
-                            <Typography
+                            {/* <Typography
                                 variant="subtitle1"
                                 component={Link}
                                 to={
@@ -238,7 +238,7 @@ const FirebaseLogin = ({ loginProp }) => {
                                 sx={{ textDecoration: 'none' }}
                             >
                                 Forgot Password?
-                            </Typography>
+                            </Typography> */}
                         </Stack>
                         {errors.submit && (
                             <Box sx={{ mt: 3 }}>

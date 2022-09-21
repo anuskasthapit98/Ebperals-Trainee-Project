@@ -55,7 +55,7 @@ const EditUser = ({ edit, editData, handleCloseModal }) => {
                 })}
                 onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                     try {
-                        const id = editData.findUserById.id;
+                        const id = editData.findUserById._id;
                         const value = { ...values, id };
 
                         const companyName = value.companyName;

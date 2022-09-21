@@ -20,11 +20,12 @@ import {
     Typography
 } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
-import { useQuery } from '@apollo/client';
+import { useMutation, HttpLink, ApolloClient, InMemoryCache, useQuery } from '@apollo/client';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import { PROJECTS } from 'gqloperations/queries';
+import { REMOVE_PROJECT } from 'gqloperations/mutations';
 
 // assets
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -92,10 +93,32 @@ const headCells = [
 // ==============================|| TABLE HEADER ||============================== //
 
 function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, selected }) {
+    const client = new ApolloClient({
+        link: new HttpLink({
+            uri: 'http://localhost:3000/graphql'
+        }),
+        cache: new InMemoryCache()
+    });
     const createSortHandler = (property) => (event) => {
         onRequestSort(event, property);
     };
 
+    const [removeData] = useMutation(REMOVE_PROJECT, {
+        variables: {
+            id: selected.toString()
+        }
+    });
+
+    const handleRemove = async () => {
+        await removeData().then(
+            () => {
+                window.location.href = '/project/project-list';
+            },
+            (err) => {
+                console.log(err);
+            }
+        );
+    };
     return (
         <TableHead>
             <TableRow>
@@ -112,7 +135,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                 </TableCell>
                 {numSelected > 0 && (
                     <TableCell padding="none" colSpan={6}>
-                        <EnhancedTableToolbar numSelected={selected.length} />
+                        <EnhancedTableToolbar numSelected={selected.length} handleRemove={handleRemove} />
                     </TableCell>
                 )}
                 {numSelected <= 0 &&
@@ -159,7 +182,7 @@ EnhancedTableHead.propTypes = {
 
 // ==============================|| TABLE HEADER TOOLBAR ||============================== //
 
-const EnhancedTableToolbar = ({ numSelected }) => (
+const EnhancedTableToolbar = ({ numSelected, handleRemove }) => (
     <Toolbar
         sx={{
             p: 0,
@@ -182,7 +205,7 @@ const EnhancedTableToolbar = ({ numSelected }) => (
         <Box sx={{ flexGrow: 1 }} />
         {numSelected > 0 && (
             <Tooltip title="Delete">
-                <IconButton size="large">
+                <IconButton size="large" onClick={handleRemove}>
                     <DeleteIcon fontSize="small" />
                 </IconButton>
             </Tooltip>
@@ -191,7 +214,8 @@ const EnhancedTableToolbar = ({ numSelected }) => (
 );
 
 EnhancedTableToolbar.propTypes = {
-    numSelected: PropTypes.number.isRequired
+    numSelected: PropTypes.number.isRequired,
+    handleRemove: PropTypes.func
 };
 
 const ProjectList = () => {
@@ -258,15 +282,15 @@ const ProjectList = () => {
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelectedId = rows.map((n) => n.name);
+            const newSelectedId = rows.map((n) => n._id);
             setSelected(newSelectedId);
             return;
         }
         setSelected([]);
     };
-
     const handleClick = (event, name) => {
         const selectedIndex = selected.indexOf(name);
+
         let newSelected = [];
 
         if (selectedIndex === -1) {
@@ -317,9 +341,8 @@ const ProjectList = () => {
                                     .map((row, index) => {
                                         /** Make sure no display bugs if row isn't an OrderData object */
                                         if (typeof row === 'number') return null;
-                                        const isItemSelected = isSelected(row.projectName);
+                                        const isItemSelected = isSelected(row._id);
                                         const labelId = `enhanced-table-checkbox-${index}`;
-
                                         return (
                                             <TableRow
                                                 hover
@@ -332,7 +355,7 @@ const ProjectList = () => {
                                                 <TableCell
                                                     padding="checkbox"
                                                     sx={{ pl: 3 }}
-                                                    onClick={(event) => handleClick(event, row.id)}
+                                                    onClick={(event) => handleClick(event, row._id)}
                                                 >
                                                     <Checkbox
                                                         color="primary"
@@ -358,7 +381,7 @@ const ProjectList = () => {
                                                     </Typography>
                                                 </TableCell>
                                                 <TableCell>{row.description} </TableCell>
-                                                <TableCell align="right">{row.startDate.substring(0, 10)}.</TableCell>
+                                                <TableCell align="right">{row.startDate.substring(0, 10)}</TableCell>
                                                 <TableCell align="center">{row.endDate.substring(0, 10)}</TableCell>
 
                                                 <TableCell align="center">

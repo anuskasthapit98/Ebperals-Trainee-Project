@@ -20,7 +20,7 @@ export const CREATE_USER = gql`
         createUser(
             userInput: { companyName: $companyName, email: $email, name: $name, phone: $phone, username: $username, userType: $userType }
         ) {
-            id
+            _id
             companyName
             email
             name
@@ -71,6 +71,33 @@ export const UPDATE_PROJECT = gql`
             startDate
             endDate
             users
+        }
+    }
+`;
+
+export const REMOVE_PROJECT = gql`
+    mutation ($id: String!) {
+        removeProject(id: $id) {
+            _id
+            projectName
+            description
+            startDate
+            endDate
+            users
+        }
+    }
+`;
+
+export const REMOVE_USER = gql`
+    mutation ($id: String!) {
+        removeUser(id: $id) {
+            _id
+            name
+            username
+            companyName
+            email
+            phone
+            userType
         }
     }
 `;

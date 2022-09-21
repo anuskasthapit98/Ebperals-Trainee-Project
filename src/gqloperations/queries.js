@@ -3,7 +3,7 @@ import { gql } from '@apollo/client';
 export const USERS = gql`
     query {
         users {
-            id
+            _id
             name
             username
             companyName
@@ -23,6 +23,7 @@ export const PROJECTS = gql`
             startDate
             endDate
             users {
+                _id
                 name
                 username
                 companyName
@@ -37,7 +38,7 @@ export const PROJECTS = gql`
 export const USER_BY_ID = gql`
     query ($id: String!) {
         findUserById(id: $id) {
-            id
+            _id
             name
             username
             companyName
@@ -57,6 +58,7 @@ export const PROJECT_BY_ID = gql`
             startDate
             endDate
             users {
+                _id
                 name
                 username
                 companyName
@@ -67,3 +69,18 @@ export const PROJECT_BY_ID = gql`
         }
     }
 `;
+
+export const REMOVE_PROJECT = gql`
+    query ($id: String!) {
+        removeProject {
+            _id
+            projectName
+            description
+            startDate
+            endDate
+            users
+        }
+    }
+`;
+
+

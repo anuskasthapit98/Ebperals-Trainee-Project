@@ -20,12 +20,13 @@ import {
     Typography
 } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
-import { useQuery } from '@apollo/client';
+import { useMutation, HttpLink, ApolloClient, InMemoryCache, useQuery } from '@apollo/client';
 
 // project imports
 import MainCard from 'ui-component/cards/MainCard';
 import UserEdit from './UserEditModal';
 import { USERS } from 'gqloperations/queries';
+import { REMOVE_USER } from 'gqloperations/mutations';
 
 // assets
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -98,8 +99,31 @@ const headCells = [
 // ==============================|| TABLE HEADER ||============================== //
 
 function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, selected }) {
+    const client = new ApolloClient({
+        link: new HttpLink({
+            uri: 'http://localhost:3000/graphql'
+        }),
+        cache: new InMemoryCache()
+    });
     const createSortHandler = (property) => (event) => {
         onRequestSort(event, property);
+    };
+
+    const [removeData] = useMutation(REMOVE_USER, {
+        variables: {
+            id: selected.toString()
+        }
+    });
+
+    const handleRemove = async () => {
+        await removeData().then(
+            () => {
+                window.location.href = '/users/users-list';
+            },
+            (err) => {
+                console.log(err);
+            }
+        );
     };
 
     return (
@@ -118,7 +142,7 @@ function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowC
                 </TableCell>
                 {numSelected > 0 && (
                     <TableCell padding="none" colSpan={6}>
-                        <EnhancedTableToolbar numSelected={selected.length} />
+                        <EnhancedTableToolbar numSelected={selected.length} handleRemove={handleRemove} />
                     </TableCell>
                 )}
                 {numSelected <= 0 &&
@@ -165,7 +189,7 @@ EnhancedTableHead.propTypes = {
 
 // ==============================|| TABLE HEADER TOOLBAR ||============================== //
 
-const EnhancedTableToolbar = ({ numSelected }) => (
+const EnhancedTableToolbar = ({ numSelected, handleRemove }) => (
     <Toolbar
         sx={{
             p: 0,
@@ -188,7 +212,7 @@ const EnhancedTableToolbar = ({ numSelected }) => (
         <Box sx={{ flexGrow: 1 }} />
         {numSelected > 0 && (
             <Tooltip title="Delete">
-                <IconButton size="large">
+                <IconButton size="large" onClick={handleRemove}>
                     <DeleteIcon fontSize="small" />
                 </IconButton>
             </Tooltip>
@@ -197,7 +221,8 @@ const EnhancedTableToolbar = ({ numSelected }) => (
 );
 
 EnhancedTableToolbar.propTypes = {
-    numSelected: PropTypes.number.isRequired
+    numSelected: PropTypes.number.isRequired,
+    handleRemove: PropTypes.func
 };
 
 const UsersList = () => {
@@ -264,7 +289,7 @@ const UsersList = () => {
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelectedId = rows.map((n) => n.name);
+            const newSelectedId = rows.map((n) => n._id);
             setSelected(newSelectedId);
             return;
         }
@@ -272,6 +297,7 @@ const UsersList = () => {
     };
 
     const handleClick = (event, name) => {
+
         const selectedIndex = selected.indexOf(name);
         let newSelected = [];
 
@@ -323,7 +349,7 @@ const UsersList = () => {
                                     .map((row, index) => {
                                         /** Make sure no display bugs if row isn't an OrderData object */
                                         if (typeof row === 'number') return null;
-                                        const isItemSelected = isSelected(row.name);
+                                        const isItemSelected = isSelected(row._id);
                                         const labelId = `enhanced-table-checkbox-${index}`;
 
                                         return (
@@ -339,7 +365,7 @@ const UsersList = () => {
                                                     <TableCell
                                                         padding="checkbox"
                                                         sx={{ pl: 3 }}
-                                                        onClick={(event) => handleClick(event, row.id)}
+                                                        onClick={(event) => handleClick(event, row._id)}
                                                     >
                                                         <Checkbox
                                                             color="primary"
@@ -374,7 +400,7 @@ const UsersList = () => {
                                                             color="secondary"
                                                             size="large"
                                                             onClick={(e) => {
-                                                                setSelectedId(row.id);
+                                                                setSelectedId(row._id);
                                                                 setOpen(true);
                                                             }}
                                                         >

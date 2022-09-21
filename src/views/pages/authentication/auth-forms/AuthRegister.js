@@ -114,7 +114,7 @@ const FirebaseRegister = () => {
                         </Button>
                     </AnimateButton>
                 </Grid> */}
-                <Grid item xs={12}>
+                {/* <Grid item xs={12}>
                     <Box sx={{ alignItems: 'center', display: 'flex' }}>
                         <Divider sx={{ flexGrow: 1 }} orientation="horizontal" />
                         <Button
@@ -144,7 +144,7 @@ const FirebaseRegister = () => {
                     <Box sx={{ mb: 2 }}>
                         <Typography variant="subtitle1">Sign up with Email address</Typography>
                     </Box>
-                </Grid>
+                </Grid> */}
             </Grid>
 
             <Formik

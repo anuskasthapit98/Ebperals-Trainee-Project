@@ -50,7 +50,7 @@ const AddProject = () => {
     const users = data.users.map((users) => users);
 
     const handleSelect = (selected) => {
-        const matchID = users.filter((element) => selected.some((e) => element.id === e));
+        const matchID = users.filter((element) => selected.some((e) => element._id === e));
         const result = matchID.map((a) => a.name);
         return result;
     };
@@ -229,7 +229,7 @@ const AddProject = () => {
                                 MenuProps={MenuProps}
                             >
                                 {data.users.map((users) => (
-                                    <MenuItem key={users.name} value={users.id}>
+                                    <MenuItem key={users.name} value={users._id}>
                                         {users.name}
                                     </MenuItem>
                                 ))}

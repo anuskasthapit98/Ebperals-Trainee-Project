@@ -56,8 +56,11 @@ const EditProject = ({ edit, editData, handleCloseModal }) => {
 
     const users = data.users.map((users) => users);
 
+    const u = editData?.findProjectById.users;
+    const assignedUsers = u.map((item) => item._id);
+
     const handleSelect = (selected) => {
-        const matchID = users.filter((element) => selected.some((e) => element.id === e));
+        const matchID = users.filter((element) => selected.some((e) => element._id === e));
         const result = matchID.map((a) => a.name);
         return result;
     };
@@ -70,7 +73,7 @@ const EditProject = ({ edit, editData, handleCloseModal }) => {
                     description: editData?.findProjectById.description,
                     startDate: editData?.findProjectById.startDate,
                     endDate: editData?.findProjectById.endDate,
-                    users: [],
+                    users: assignedUsers,
                     submit: null
                 }}
                 validationSchema={Yup.object().shape({
@@ -239,7 +242,7 @@ const EditProject = ({ edit, editData, handleCloseModal }) => {
                                 MenuProps={MenuProps}
                             >
                                 {data.users.map((users) => (
-                                    <MenuItem key={users.name} value={users.id}>
+                                    <MenuItem key={users.name} value={users._id}>
                                         {users.name}
                                     </MenuItem>
                                 ))}

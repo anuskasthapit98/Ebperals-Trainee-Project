@@ -2,23 +2,11 @@ import PropTypes from 'prop-types';
 import { useState } from 'react';
 
 // material-ui
-import {
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Grid,
-    MenuItem,
-    Modal,
-    Rating,
-    TextField,
-    Typography
-} from '@mui/material';
+import { Grid, Modal, Typography, Stack } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 // project imports
 import { gridSpacing } from 'store/constant';
-import AnimateButton from 'ui-component/extended/AnimateButton';
 import { useQuery } from '@apollo/client';
 import { USER_BY_ID } from 'gqloperations/queries';
 import AddUser from 'views/pages/authentication/auth-forms/AddUser';
@@ -38,6 +26,7 @@ const style = {
 };
 
 const UserEdit = ({ open, handleCloseModal, selectedId, edit, setEdit }) => {
+    const theme = useTheme();
     const { data, loading, error } = useQuery(USER_BY_ID, {
         variables: {
             id: selectedId
@@ -64,6 +53,13 @@ const UserEdit = ({ open, handleCloseModal, selectedId, edit, setEdit }) => {
                     <Grid container spacing={gridSpacing}>
                         <Grid item xs={12}>
                             <Grid container justifyContent="center" alignItems="center" sx={{ minHeight: 'calc(100vh - 68px)' }}>
+                                <Grid item>
+                                    <Stack alignItems="center" justifyContent="center">
+                                        <Typography color={theme.palette.secondary.main} gutterBottom>
+                                            Edit User
+                                        </Typography>
+                                    </Stack>
+                                </Grid>
                                 <Grid item>
                                     <AuthCardWrapper sx={style}>
                                         <Grid container spacing={2} alignItems="center" justifyContent="center">
