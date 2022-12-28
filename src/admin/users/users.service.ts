@@ -14,14 +14,22 @@ export class UsersService {
   // Create new user
   async createUser(userInput: CreateUserInput): Promise<User> {
     const user = await this.userModel
-      .findOne({ email: userInput.email })
+      .findOne({ username: userInput.username })
       .exec();
     if (user) {
-      throw new NotFoundException(`User with this email already exists`);
+      throw new NotFoundException(`User already exists`);
     }
-    userInput.password = await this.encodePassword(userInput.password);
-    const createUser = await this.userModel.create(userInput);
+    const password = await this.encodePassword(userInput.username);
+    const createUser = await this.userModel.create({ ...userInput, password });
     return createUser.save();
+  }
+
+  async removeUser(id: string) {
+    const user = await this.userModel.findByIdAndRemove({ _id: id }).exec();
+    if (!user) {
+      throw new NotFoundException(`User ${id} not found`);
+    }
+    return user;
   }
 
   async findAll(): Promise<User[]> {
@@ -30,7 +38,6 @@ export class UsersService {
   }
 
   async updateUser(id: String, updateUserInput: UpdateUserInput) {
-    updateUserInput.password = await this.encodePassword(updateUserInput.password)
     const updateUser = await this.userModel
       .findOneAndUpdate({ _id: id }, { $set: updateUserInput }, { new: true })
       .exec();

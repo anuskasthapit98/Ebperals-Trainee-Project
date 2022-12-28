@@ -15,6 +15,15 @@ export class Admin extends mongoose.Document {
 
   @Prop({ type: String })
   refreshToken: string;
+
+  @Prop({ type: String })
+  otp: string;
+
+  @Prop({ type: String })
+  otpCreatedAt: string;
+
+  @Prop({ type: String })
+  token: string;
 }
 
 export const AdminSchema = SchemaFactory.createForClass(Admin);

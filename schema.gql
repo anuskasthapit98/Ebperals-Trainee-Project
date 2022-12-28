@@ -3,7 +3,7 @@
 # ------------------------------------------------------
 
 type User {
-  id: ID!
+  _id: ID!
   name: String!
   username: String!
   companyName: String!
@@ -87,27 +87,40 @@ type Tokens {
   refreshToken: String!
 }
 
-type Test {
-  """Example field (placeholder)"""
-  exampleField: Int!
+type ChangePasswordStatus {
+  status: Boolean!
+}
+
+type ResetPasswordToken {
+  token: String!
+}
+
+type ForgetPasswordTokens {
+  token: String!
+  accessToken: String!
+}
+
+type GenerateOtp {
+  otp: String!
 }
 
 type Query {
   users: [User!]!
+  findUserById(id: String!): User!
   projects: [ProjectListResponse!]!
   findProjectById(id: String!): ProjectListResponse!
   tasks: [Task!]!
   clockIns: [ClockIn!]!
   User: User!
   me: Admin!
-  tests: [Test!]!
-  test(id: Int!): Test!
 }
 
 type Mutation {
   createUser(userInput: CreateUserInput!): User!
+  removeUser(id: String!): User!
   updateUser(updateUserInput: UpdateUserInput!): User!
   createProject(projectInput: CreateProjectInput!): ProjectResponse!
+  removeProject(id: String!): ProjectResponse!
   updateProject(updateProjectInput: UpdateProjectInput!): ProjectResponse!
   createTask(createTaskInput: CreateTaskInput!): Task!
   addClockIn(clockInInput: CreateClockInInput!): ClockIn!
@@ -115,9 +128,10 @@ type Mutation {
   refreshToken(token: String!): Tokens!
   addAdmin(data: CreateAdminInput!): Tokens!
   loginAdmin(data: AdminLoginInput!): Tokens!
-  createTest(createTestInput: CreateTestInput!): Test!
-  updateTest(updateTestInput: UpdateTestInput!): Test!
-  removeTest(id: Int!): Test!
+  changePassword(data: ChangePasswordInput!): ChangePasswordStatus!
+  resetPassword(data: AdminLoginInput!): ResetPasswordToken!
+  forgetPassword(data: AdminOtpInput!): ForgetPasswordTokens!
+  generateOtp(data: String!): GenerateOtp!
 }
 
 input CreateUserInput {
@@ -125,7 +139,6 @@ input CreateUserInput {
   username: String!
   companyName: String!
   email: String!
-  password: String!
   phone: Float!
   userType: UserType!
 }
@@ -135,7 +148,6 @@ input UpdateUserInput {
   username: String
   companyName: String
   email: String
-  password: String
   phone: Float
   userType: UserType
   _id: ID!
@@ -193,13 +205,13 @@ input AdminLoginInput {
   password: String!
 }
 
-input CreateTestInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+input ChangePasswordInput {
+  email: String!
+  token: String!
+  password: String!
 }
 
-input UpdateTestInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
+input AdminOtpInput {
+  email: String!
+  otp: String!
 }

@@ -68,54 +68,54 @@ export class AuthResolver {
     return admin;
   }
 
-  // @UseGuards(JwtGuard)
-  // @Mutation(() => ChangePasswordStatus)
-  // async changePassword(
-  //   @Args('data') data: ChangePasswordInput,
-  // ): Promise<ChangePasswordStatus> {
-  //   try {
-  //     const changePassword = await this.authService.changePassword(data);
-  //     return { status: changePassword.status };
-  //   } catch (err) {
-  //     console.log(err);
-  //     throw new UnauthorizedException('Invalid Credentials');
-  //   }
-  // }
+  @UseGuards(JwtGuard)
+  @Mutation(() => ChangePasswordStatus)
+  async changePassword(
+    @Args('data') data: ChangePasswordInput,
+  ): Promise<ChangePasswordStatus> {
+    try {
+      const changePassword = await this.authService.changePassword(data);
+      return { status: changePassword.status };
+    } catch (err) {
+      console.log(err);
+      throw new UnauthorizedException('Invalid Credentials');
+    }
+  }
 
-  // @Mutation(() => ResetPasswordToken)
-  // async resetPassword(
-  //   @Args('data') data: AdminLoginInput,
-  // ): Promise<ResetPasswordToken> {
-  //   try {
-  //     const token = await this.authService.resetPassword(data);
-  //     return { token: token.token };
-  //   } catch (err) {
-  //     console.log(err);
-  //     throw new UnauthorizedException('Invalid Credentials');
-  //   }
-  // }
+  @Mutation(() => ResetPasswordToken)
+  async resetPassword(
+    @Args('data') data: AdminLoginInput,
+  ): Promise<ResetPasswordToken> {
+    try {
+      const token = await this.authService.resetPassword(data);
+      return { token: token.token };
+    } catch (err) {
+      console.log(err);
+      throw new UnauthorizedException('Invalid Credentials');
+    }
+  }
 
-  // @Mutation(() => ForgetPasswordTokens)
-  // async forgetPassword(
-  //   @Args('data') data: AdminOtpInput,
-  // ): Promise<ForgetPasswordTokens> {
-  //   try {
-  //     const tokens = await this.authService.forgetPassword(data);
-  //     return tokens;
-  //   } catch (err) {
-  //     console.log(err);
-  //     throw new UnauthorizedException('Invalid Credentials');
-  //   }
-  // }
+  @Mutation(() => ForgetPasswordTokens)
+  async forgetPassword(
+    @Args('data') data: AdminOtpInput,
+  ): Promise<ForgetPasswordTokens> {
+    try {
+      const tokens = await this.authService.forgetPassword(data);
+      return tokens;
+    } catch (err) {
+      console.log(err);
+      throw new UnauthorizedException('Invalid Credentials');
+    }
+  }
 
-  // @Mutation(() => GenerateOtp)
-  // async generateOtp(@Args('data') email: string): Promise<GenerateOtp> {
-  //   try {
-  //     const otp = await this.authService.generateOtp(email);
-  //     return { otp: otp.otp };
-  //   } catch (err) {
-  //     console.log(err);
-  //     throw new UnauthorizedException('Invalid Credentials');
-  //   }
-  // }
+  @Mutation(() => GenerateOtp)
+  async generateOtp(@Args('data') email: string): Promise<GenerateOtp> {
+    try {
+      const otp = await this.authService.generateOtp(email);
+      return { otp: otp.otp };
+    } catch (err) {
+      console.log(err);
+      throw new UnauthorizedException('Invalid Credentials');
+    }
+  }
 }

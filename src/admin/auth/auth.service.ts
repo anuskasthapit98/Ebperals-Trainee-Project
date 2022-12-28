@@ -31,7 +31,6 @@ let saltRounds = 10;
 export class AuthService {
   constructor(
     @InjectModel('Admin') private readonly adminModel: Model<Admin>,
-    
     private readonly adminService: AdminService,
     private readonly jwtService: JwtService,
     private config: ConfigService,
@@ -44,13 +43,13 @@ export class AuthService {
   }
 
   async addAdmin(createAdmin: CreateAdminInput): Promise<Tokens> {
-    const userExists = await this.adminService.findAdminByEmail(
-      createAdmin.email,
-    );
+    // const userExists = await this.adminService.findAdminByEmail(
+    //   createAdmin.email,
+    // );
 
-    if (userExists) {
-      throw new BadRequestException('User already exists');
-    }
+    // if (userExists) {
+    //   throw new BadRequestException('User already exists');
+    // }
 
     const newUser = await this.adminService.createAdmin(createAdmin);
     const payload = {
@@ -129,72 +128,74 @@ export class AuthService {
     throw new InternalServerErrorException('Error in login');
   }
 
-  // async changePassword(
-  //   data: ChangePasswordInput,
-  // ): Promise<ChangePasswordStatus> {
-  //   const admin = await this.adminService.findAdminByEmail(data.email);
-  //   if (!admin) return;
+  async changePassword(
+    data: ChangePasswordInput,
+  ): Promise<ChangePasswordStatus> {
+    const admin = await this.adminService.findAdminByEmail(data.email);
+    if (!admin) return;
 
-  //   const tokenMatch = await bcrypt.compare(data.token, admin.token);
-  //   if (!tokenMatch) return;
-  //   else {
-  //     const hashPassword = await bcrypt.hash(data.password, saltRounds);
-  //     const updatePassword = await this.adminModel.findByIdAndUpdate(admin.id, {
-  //       password: hashPassword,
-  //       token: null,
-  //     });
-  //     return { status: !!updatePassword };
-  //   }
-  // }
+    const tokenMatch = await bcrypt.compare(data.token, admin.token);
+    if (!tokenMatch) return;
+    else {
+      const hashPassword = await bcrypt.hash(data.password, saltRounds);
+      const updatePassword = await this.adminModel.findByIdAndUpdate(admin.id, {
+        password: hashPassword,
+        token: null,
+      });
+      return { status: !!updatePassword };
+    }
+  }
 
-  // async resetPassword(data: AdminLoginInput): Promise<ResetPasswordToken> {
-  //   const admin = await this.adminService.findAdminByEmail(data.email);
-  //   if (!admin) return;
+  async resetPassword(data: AdminLoginInput): Promise<ResetPasswordToken> {
+    const admin = await this.adminService.findAdminByEmail(data.email);
+    if (!admin) return;
 
-  //   const passwordMatch = await bcrypt.compare(data.password, admin.password);
-  //   if (!passwordMatch) return;
-  //   else {
-  //     const timestamp = new Date().getTime().toString();
-  //     const hashTimestamp = await bcrypt.hash(timestamp, saltRounds);
-  //     await this.adminModel.findByIdAndUpdate(admin.id, {
-  //       token: hashTimestamp,
-  //     });
-  //     return { token: timestamp };
-  //   }
-  // }
+    const passwordMatch = await bcrypt.compare(data.password, admin.password);
+    if (!passwordMatch) return;
+    else {
+      const timestamp = new Date().getTime().toString();
+      const hashTimestamp = await bcrypt.hash(timestamp, saltRounds);
+      await this.adminModel.findByIdAndUpdate(admin.id, {
+        token: hashTimestamp,
+      });
+      return { token: timestamp };
+    }
+  }
 
-  // async forgetPassword(data: AdminOtpInput): Promise<ForgetPasswordTokens> {
-  //   const admin = await this.adminService.findAdminByEmail(data.email);
-  //   if (!admin) return;
+  async forgetPassword(data: AdminOtpInput): Promise<ForgetPasswordTokens> {
+    const admin = await this.adminService.findAdminByEmail(data.email);
 
-  //   const otpMatch = await bcrypt.compare(data.otp, admin.otp);
-  //   if (!otpMatch) return;
-  //   const payload = {
-  //     adminId: admin.id,
-  //     email: admin.email,
-  //   };
-  //   const tokens = await this.createTokens(payload);
-  //   const timestamp = new Date().getTime().toString();
-  //   const hashTimestamp = await bcrypt.hash(timestamp, saltRounds);
-  //   await this.adminModel.findByIdAndUpdate(admin.id, {
-  //     token: hashTimestamp,
-  //     otp: null,
-  //   });
-  //   return { token: timestamp, accessToken: tokens.accessToken };
-  // }
+    if (!admin) return;
 
-  // async generateOtp(email: string): Promise<GenerateOtp> {
-  //   const admin = await this.adminService.findAdminByEmail(email);
-  //   if (!admin) return;
-  //   else {
-  //     let otpCreatedAt = new Date().getTime().toString();
-  //     const otp = generateRandomNumber(6);
-  //     const hashOtp = await bcrypt.hash(otp, saltRounds);
-  //     await this.adminModel.findByIdAndUpdate(admin.id, {
-  //       otp: hashOtp,
-  //       otpCreatedAt: otpCreatedAt,
-  //     });
-  //     return { otp };
-  //   }
-  // }
+    const otpMatch = await bcrypt.compare(data.otp, admin.otp);
+
+    if (!otpMatch) throw new ForbiddenException('OTP not matched');
+    const payload = {
+      adminId: admin.id,
+      email: admin.email,
+    };
+    const tokens = await this.createTokens(payload);
+    const timestamp = new Date().getTime().toString();
+    const hashTimestamp = await bcrypt.hash(timestamp, saltRounds);
+    await this.adminModel.findByIdAndUpdate(admin.id, {
+      token: hashTimestamp,
+      otp: null,
+    });
+    return { token: timestamp, accessToken: tokens.accessToken };
+  }
+
+  async generateOtp(email: string): Promise<GenerateOtp> {
+    const admin = await this.adminService.findAdminByEmail(email);
+    if (!admin) return;
+    else {
+      let otpCreatedAt = new Date().getTime().toString();
+      const otp = generateRandomNumber(6);
+      const hashOtp = await bcrypt.hash(otp, saltRounds);
+      await this.adminModel.findByIdAndUpdate(admin.id, {
+        otp: hashOtp,
+        otpCreatedAt: otpCreatedAt,
+      });
+      return { otp };
+    }
+  }
 }

@@ -17,10 +17,23 @@ export class UsersResolver {
     return user;
   }
 
+  @Mutation(() => User)
+  // @UseGuards(JwtGuard)
+  async removeUser(@Args('id') id: string): Promise<User> {
+    const user = await this.usersService.removeUser(id);
+    return user;
+  }
+
   @Query(() => [User])
   async users(): Promise<User[]> {
     const users = this.usersService.findAll();
     return users;
+  }
+
+  @Query(() => User)
+  async findUserById(@Args('id') id: string): Promise<User> {
+    const user = await this.usersService.findOne(id);
+    return user;
   }
 
   @Mutation(() => User)

@@ -12,7 +12,6 @@ import { TaskModule } from './app-users/task/task.module';
 import { ClockInModule } from './app-users/clock-in/clock-in.module';
 import { LoginModule } from './app-users/login/login.module';
 import { AuthModule } from './admin/auth/auth.module';
-import { TestsModule } from './tests/tests.module';
 
 @Module({
   imports: [
@@ -47,7 +46,6 @@ import { TestsModule } from './tests/tests.module';
     ClockInModule,
     LoginModule,
     AuthModule,
-    TestsModule,
   ],
   // controllers: [AppController],
   // providers: [AppService],

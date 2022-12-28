@@ -23,6 +23,16 @@ export class ProjectService {
     return createProject.save();
   }
 
+  async removeProject(id: string){
+    const projectById = await this.projectModel
+      .findByIdAndRemove({ _id: id })
+      .exec();
+    if (!projectById) {
+      throw new NotFoundException(`Project ${id} not found`);
+    }
+    return projectById;
+  }
+
   async findAll(): Promise<ProjectListResponse[]> {
     // const projects = await this.projectModel.find().exec();
     const projects = await this.projectModel.aggregate([
